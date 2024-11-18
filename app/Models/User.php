@@ -23,6 +23,7 @@ class User extends Authenticatable
         'id_document',
         'email',
         'password',
+        'role',
     ];
 
     /**
