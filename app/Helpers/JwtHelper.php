@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Firebase\JWT\Key;
 use Firebase\JWT\JWT;
 use Illuminate\Validation\UnauthorizedException;
 
@@ -22,7 +23,8 @@ if (!function_exists('jwt_decode_token')) {
     function jwt_decode_token(string $token): object
     {
         try {
-            return JWT::decode($token, ENV('JWT_SECRET'));
+            $key = new Key(ENV('JWT_SECRET'), ENV('JWT_ALGO'));
+            return JWT::decode($token, $key);
         } catch(Exception $e) {
             throw new UnauthorizedException($e->getMessage());
         }
