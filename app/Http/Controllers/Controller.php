@@ -11,6 +11,11 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    public function authSuccess(array $data): JsonResponse
+    {
+        return response()->json($data);
+    }
+
     public function success($data): JsonResponse
     {
         return response()->json(['data' => $data]);
