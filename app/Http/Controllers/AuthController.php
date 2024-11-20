@@ -25,12 +25,12 @@ class AuthController extends Controller
             'last_name' => 'required|string',
             'id_document' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'repeat_email' => 'required|email|same:email',
             'password' => 'required|string|min:6',
+            'repeat_password' => 'required|string|min:6|same:password',
         ];
 
         $messages = [
-            'repeat_email.same' => 'The email must match.',
+            'repeat_password.same' => 'The password must match.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
