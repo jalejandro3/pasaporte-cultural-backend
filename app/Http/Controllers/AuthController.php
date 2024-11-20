@@ -16,6 +16,27 @@ class AuthController extends Controller
     }
 
     /**
+     * @throws InputValidationException
+     */
+    public function login(Request $request): JsonResponse
+    {
+        $rules = [
+            'email' => 'bail|required',
+            'password' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->authSuccess(
+            $this->authService->login($request->get('email'), $request->get('password'))
+        );
+    }
+
+    /**
      * @throws ApplicationException
      */
     public function register(Request $request): JsonResponse
