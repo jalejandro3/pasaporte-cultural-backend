@@ -1,0 +1,8 @@
+<?php
+
+namespace App\Services;
+
+interface UserService
+{
+    public function getProfile(string $token): array;
+}
