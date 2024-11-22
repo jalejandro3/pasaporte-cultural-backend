@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,18 +16,18 @@ class Jwt
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            return response()->json(['message' => 'Token not found'], 401);
-        }
-
         try {
+            $token = $request->bearerToken();
+
+            if (!$token) {
+                return response()->json(['message' => 'Token not found'], Response::HTTP_UNAUTHORIZED);
+            }
+
             $decoded = jwt_decode_token($token);
 
             $request->auth = $decoded;
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Invalid token', 'error' => $e->getMessage()], 401);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);
