@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\AdminUser;
+use App\Http\Middleware\Jwt;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,4 +26,8 @@ Route::post('auth/register', [AuthController::class, 'register']);
 /**
  * USERS
  */
-Route::middleware('jwt')->get('users/profile', [UserController::class, 'profile']);
+Route::middleware(Jwt::class)->get('users/profile', [UserController::class, 'profile']);
+Route::middleware(AdminUser::class)->group(function () {
+    Route::put('users/{id}', [UserController::class, 'update']);
+    Route::delete('users/{id}', [UserController::class, 'destroy']);
+});
