@@ -16,6 +16,11 @@ class UserRepository implements UserRepositoryInterface
         return $this->user->fill($data)->save();
     }
 
+    public function findById(int $id): ?User
+    {
+        return $this->user->find($id);
+    }
+
     public function findByEmail(string $email): ?User
     {
         return $this->user->whereEmail($email)->first();
