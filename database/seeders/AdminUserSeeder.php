@@ -18,7 +18,8 @@ class AdminUserSeeder extends Seeder
             'last_name' => '',
             'id_document' => '1122334455',
             'email' => 'admin@comunidadunir.net',
-            'password' => Hash::make('Unir123$*'), 
+            'email_verified_at' => now(),
+            'password' => Hash::make('Unir123$*'),
             'role' => 'admin',
         ]);
     }
