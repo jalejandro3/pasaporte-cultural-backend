@@ -21,13 +21,13 @@ use Illuminate\Support\Facades\Route;
  * AUTH
  */
 Route::post('auth/login', [AuthController::class, 'login']);
-Route::post('auth/register', [AuthController::class, 'register']);
+Route::middleware('validate.domain')->post('auth/register', [AuthController::class, 'register']);
 
 /**
  * USERS
  */
-Route::middleware(Jwt::class)->get('users/profile', [UserController::class, 'profile']);
-Route::middleware(AdminUser::class)->group(function () {
+Route::middleware('jwt')->get('users/profile', [UserController::class, 'profile']);
+Route::middleware('admin.user')->group(function () {
     Route::put('users/{id}', [UserController::class, 'update']);
     Route::delete('users/{id}', [UserController::class, 'destroy']);
 });
