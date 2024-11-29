@@ -17,6 +17,7 @@ class AuthController extends Controller
 
     /**
      * @throws InputValidationException
+     * @throws ApplicationException
      */
     public function login(Request $request): JsonResponse
     {
