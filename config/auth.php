@@ -112,4 +112,16 @@ return [
 
     'password_timeout' => 10800,
 
+    /*
+     |--------------------------------------------------------------------------
+     | Valid Email Domains
+     |--------------------------------------------------------------------------
+     |
+     | Here you define the valid email domains for user registration.
+     */
+
+    'allowed_domains' => [
+        'comunidadunir.net',
+    ],
+
 ];
