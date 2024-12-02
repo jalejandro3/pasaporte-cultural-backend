@@ -15,14 +15,14 @@ class ValidateDomain
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $email = $request->only(['email']);
+        $email = $request->get('email');
         $allowedDomains = config('auth.allowed_domains', []);
 
         if (!count($allowedDomains)) {
             return response()->json(['message' => 'No valid domains were configured.'], Response::HTTP_BAD_REQUEST);
         }
 
-        if (!in_array($email, $allowedDomains)) {
+        if (!in_array(extract_domain($email), $allowedDomains)) {
             return response()->json(['message' => 'Invalid data. Please try again'], Response::HTTP_BAD_REQUEST);
         }
 
