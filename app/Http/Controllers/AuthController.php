@@ -59,7 +59,7 @@ class AuthController extends Controller
             throw new InputValidationException($validator->getMessageBag()->toJson());
         }
 
-        return $this->success($this->tokenService->refresh($request->get('refresh_token')));
+        return $this->authSuccess($this->tokenService->refresh($request->get('refresh_token')));
     }
 
     /**
