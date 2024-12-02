@@ -4,14 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApplicationException;
 use App\Exceptions\InputValidationException;
-use App\Services\AuthService;
+use App\Models\RefreshToken;
+use App\Services\AuthService as AuthServiceInterface;
+use App\Services\TokenService as TokenServiceInterface;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly AuthService $authService)
+    public function __construct(
+        private readonly AuthServiceInterface $authService,
+        private readonly TokenServiceInterface $tokenService,
+        private readonly RefreshToken $refreshToken
+    )
     {
     }
 
@@ -35,6 +42,24 @@ class AuthController extends Controller
         return $this->authSuccess(
             $this->authService->login($request->get('email'), $request->get('password'))
         );
+    }
+
+    /**
+     * @throws ApplicationException
+     */
+    public function refreshToken(Request $request): JsonResponse
+    {
+        $rules = [
+            'refresh_token' => 'required|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->tokenService->refresh($request->get('refresh_token')));
     }
 
     /**

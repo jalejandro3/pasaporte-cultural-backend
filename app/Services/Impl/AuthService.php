@@ -5,13 +5,17 @@ namespace App\Services\Impl;
 use App\Exceptions\ApplicationException;
 use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\AuthService as AuthServiceInterface;
+use App\Services\TokenService as TokenServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class AuthService implements AuthServiceInterface
 {
-    public function __construct(private readonly UserRepositoryInterface $userRepository)
+    public function __construct(
+        private readonly TokenServiceInterface $tokenService,
+        private readonly UserRepositoryInterface $userRepository
+    )
     {
     }
 
@@ -27,8 +31,12 @@ class AuthService implements AuthServiceInterface
             throw new ApplicationException('Wrong email or password, please verify your data.');
         }
 
+        $accessToken = $this->tokenService->createAccessToken($user);
+        $refreshToken = $this->tokenService->createRefreshToken($user);
+
         return [
-            'token' => jwt_build_token($user->toArray()),
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
             'data' => $user->toArray()
         ];
     }
@@ -37,6 +45,7 @@ class AuthService implements AuthServiceInterface
     public function register(array $userData): array
     {
         $this->emailExists($userData['email']);
+
         $this->idDocumentExists($userData['id_document']);
 
         $userData['password'] = Hash::make($userData['password']);
