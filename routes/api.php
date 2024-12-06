@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Route;
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/refresh-token', [AuthController::class, 'refreshToken']);
 Route::middleware('validate.domain')->post('auth/register', [AuthController::class, 'register']);
-
 Route::middleware('jwt')->group(function () {
     /**
      * USERS
@@ -34,3 +33,27 @@ Route::middleware('jwt')->group(function () {
         Route::delete('users/{id}', [UserController::class, 'destroy']);
     });
 });
+
+/**
+ * Modificar perfil
+ */
+Route::middleware('auth:sanctum')->put('/updateProfile', [UserController::class, 'updateProfile']);
+
+
+/**
+ * Prueba de middlware
+ */
+Route::middleware('auth:sanctum')->get('/test', function () {
+    return response()->json(['message' => 'Authenticated!']);
+});
+
+/**
+ * Fin de prueba de middlware
+ */
+
+Route::get('/genera-token', function () {
+    $user = \App\Models\User::where('id_document', operator: '2233445566')->first(); // Selecciona el usuario de test creado en el seeder
+    $token = $user->createToken('TestToken')->plainTextToken; 
+    return response()->json(['token' => $token]);
+});
+
