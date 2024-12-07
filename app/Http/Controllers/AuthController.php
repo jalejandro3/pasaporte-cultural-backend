@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApplicationException;
 use App\Exceptions\InputValidationException;
-use App\Models\RefreshToken;
 use App\Services\AuthService as AuthServiceInterface;
 use App\Services\TokenService as TokenServiceInterface;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +15,6 @@ class AuthController extends Controller
     public function __construct(
         private readonly AuthServiceInterface $authService,
         private readonly TokenServiceInterface $tokenService,
-        private readonly RefreshToken $refreshToken
     )
     {
     }
