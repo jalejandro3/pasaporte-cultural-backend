@@ -28,7 +28,7 @@ Route::middleware('jwt')->group(function () {
      * USERS
      */
     Route::get('users/profile', [UserController::class, 'profile']);
-    Route::put('users/profile', [UserController::class, 'updateProfile']);
+    Route::put('users/profile', [UserController::class, 'updateProfile'])->middleware('validate.domain');
     Route::middleware('admin.user')->group(function () {
         Route::put('users/{id}', [UserController::class, 'update']);
         Route::delete('users/{id}', [UserController::class, 'destroy']);
