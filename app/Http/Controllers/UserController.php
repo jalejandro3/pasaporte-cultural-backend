@@ -7,9 +7,6 @@ use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\UserService as UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -18,8 +15,7 @@ class UserController extends Controller
         private readonly User $user,
         private readonly UserRepositoryInterface $userRepository,
         private readonly UserServiceInterface $userService
-    ) {
-    }
+    ) {}
 
     public function destroy(int $id): JsonResponse
     {
@@ -57,44 +53,32 @@ class UserController extends Controller
     public function updateProfile(Request $request): JsonResponse
     {
         try {
-            // Validar la solicitud
-            $validator = Validator::make($request->all(), [
-                'email' => 'nullable|email|unique:users,email',
-                'password' => 'nullable|string|min:6',
+
+            $validarDatos = $request->validate([
+                'email' => 'required|email|unique:users,email',
+                'password' => [
+                    'required',
+                    'min:8',
+                    'regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/', // Requiere al menos una letra y un número
+                ],
             ]);
-            if ($validator->fails()) {
-                return response()->json([
-                    'code' => 400,
-                    'msg' => $validator->errors()->first(),
-                ], 400);
-            }
-            // Obtener el usuario autenticado
-            $user = Auth::user();
-            // var_dump($user);
-            // exit;
-            if (!$user) {
-                return response()->json([
-                    'code' => 401,
-                    'msg' => 'Unauthorized. Please login first.',
-                ], 401);
-            }
-            // Actualizar los campos si están presentes
-            if ($request->filled('email')) {
-                $user->email = $request->email;
-            }
-            if ($request->filled('password')) {
-                $user->password = Hash::make($request->password);
-            }
-            // Guardar los cambios en la base de datos
-            $user->save();
+
+            $this->userService->updateProfile($request->bearerToken(), $validarDatos);
             return response()->json([
-                'code' => 200,
+                'code' => '200',
                 'msg' => 'User updated successfully.',
             ], 200);
-        } catch (\Exception $th) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'code' => 500,
-                'msg' => 'An error occurred while updating the user.',
+                'code' => '400',
+                'message' => 'Error de validación',
+                'errors' => $e->errors(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => '500',
+                'message' => 'Error al actualizar el perfil',
+                'details' => $e->getMessage(),
             ], 500);
         }
     }
