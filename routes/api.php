@@ -22,7 +22,8 @@ use Illuminate\Support\Facades\Route;
  */
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/refresh-token', [AuthController::class, 'refreshToken']);
-Route::middleware('validate.domain')->post('auth/register', [AuthController::class, 'register']);
+Route::middleware(['validate.domain', 'validate.role'])->post('auth/register', [AuthController::class, 'register']);
+
 Route::middleware('jwt')->group(function () {
     /**
      * USERS
