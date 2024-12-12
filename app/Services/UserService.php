@@ -5,5 +5,6 @@ namespace App\Services;
 interface UserService
 {
     public function getProfile(string $token): array;
-    public function updateProfile(string $token, array $data): void;
+    public function updateProfile(string $token, array $data): array;
+    public function updateRole(int $id, array $data): array;
 }

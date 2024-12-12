@@ -9,26 +9,49 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class UserService implements UserServiceInterface
 {
-    public function __construct(
-        private readonly UserRepositoryInterface $userRepository
-    ) {}
+    public function __construct(private readonly UserRepositoryInterface $userRepository)
+    {
+    }
+
     public function getProfile(string $token): array
     {
         $user = jwt_decode_token($token);
 
         return (array) $user->data;
     }
-    public function updateProfile(string $token, array $data): void
+
+    public function updateProfile(string $token, array $data): array
     {
-        // Decodificar el token para obtener los datos del usuario
-        $data = jwt_decode_token($token);
-        $user = $this->userRepository->findById($data->data->id);
+        $decoded = jwt_decode_token($token);
+        $user = $this->userRepository->findById($decoded->data->id);
+
         if (!$user) {
-            throw new ResourceNotFoundException('User does not exists.');
+            throw new ResourceNotFoundException('User not found.');
         }
-        $user->update([
-            'email' => $user['email'],
-            'password' => Hash::make($user['password']),
-        ]);
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        $user->update($data);
+
+        return ['message' => 'User updated successfully.'];
+    }
+
+    public function updateRole(int $id, array $data): array
+    {
+        if (!$user = $this->userRepository->findById($id)) {
+            throw new ResourceNotFoundException('User not found.');
+        }
+
+        $role = $data['role'];
+
+        if ($role !== $user->role) {
+            $user->role = $role;
+
+            $user->save();
+        }
+
+        return ['message' => 'User updated successfully.'];
     }
 }
