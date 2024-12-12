@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InputValidationException;
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\UserService as UserServiceInterface;
@@ -9,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class UserController extends Controller
 {
@@ -17,47 +18,44 @@ class UserController extends Controller
         private readonly User $user,
         private readonly UserRepositoryInterface $userRepository,
         private readonly UserServiceInterface $userService
-    ) {}
+    )
+    {
+    }
 
     public function destroy(int $id): JsonResponse
     {
         if (!$this->userRepository->findById($id)) {
-            return $this->error('User not found.', Response::HTTP_NOT_FOUND);
+            throw new ResourceNotFoundException('User not found.');
         }
 
         $this->user->destroy($id);
 
         return $this->success(['message' => 'User deleted successfully.']);
     }
+
     public function profile(Request $request): JsonResponse
     {
         return $this->success($this->userService->getProfile($request->bearerToken()));
     }
-    public function update(int $id, Request $request): JsonResponse
-    {
-        if (!$this->userRepository->findById($id)) {
-            return $this->error('User not found.', Response::HTTP_NOT_FOUND);
-        }
-        $user = $this->userRepository->findById($id);
-        $role = $request->get('role');
-        if ($role !== $user->role) {
-            $user->role = $role;
 
-            $user->save();
-        }
-        return $this->success(['message' => 'User updated successfully.']);
+    public function updateRole(int $id, Request $request): JsonResponse
+    {
+        return $this->success($this->userService->updateRole($id, $request->all()));
     }
+
     public function updateProfile(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => ['required', 'email'],
-            'password' => ['required', Password::min(8)->letters()->numbers()],
-        ]);
+        $rules = [
+            'email' => 'email',
+            'password' => Password::min(8)->mixedCase()->numbers(),
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            throw new InputValidationException($validator->getMessageBag()->toJson());
         }
-        $validated = $validator->validated();
-        $this->userService->updateProfile($request->bearerToken(), $validated);
-        return $this->success(['message' => 'User updated successfully.']);
+
+        return $this->success($this->userService->updateProfile($request->bearerToken(), $request->all()));
     }
 }

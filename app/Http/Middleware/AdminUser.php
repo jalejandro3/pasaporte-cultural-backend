@@ -21,7 +21,7 @@ class AdminUser
             $token = $request->bearerToken();
 
             if (!$token) {
-                return response()->json(['message' => 'Token not found'], Response::HTTP_UNAUTHORIZED);
+                return response()->json(['message' => 'Token not found.'], Response::HTTP_UNAUTHORIZED);
             }
 
             $decoded = jwt_decode_token($token);

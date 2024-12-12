@@ -24,7 +24,7 @@ class AuthService implements AuthServiceInterface
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
-            throw new ResourceNotFoundException('User does not exists.');
+            throw new ResourceNotFoundException('User not found.');
         }
 
         if (!Auth::attempt(['email' => $email, 'password' => $password])) {
@@ -37,7 +37,7 @@ class AuthService implements AuthServiceInterface
         return [
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
-            'data' => $user->toArray()
+            'user' => $user->toArray()
         ];
     }
 
@@ -61,7 +61,7 @@ class AuthService implements AuthServiceInterface
     private function emailExists(string $email): void
     {
         if ($this->userRepository->findByEmail($email)) {
-            throw new ApplicationException('The email is already taken, please use a new one.');
+            throw new ApplicationException('The email already exists, please use a new one.');
         }
     }
 
@@ -71,7 +71,7 @@ class AuthService implements AuthServiceInterface
     private function idDocumentExists(string $idDocument): void
     {
         if ($this->userRepository->findByIdDocument($idDocument)) {
-            throw new ApplicationException('The id document is already exists.');
+            throw new ApplicationException('The id document already exists.');
         }
     }
 }

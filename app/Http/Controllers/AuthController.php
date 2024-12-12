@@ -4,20 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApplicationException;
 use App\Exceptions\InputValidationException;
-use App\Models\RefreshToken;
 use App\Services\AuthService as AuthServiceInterface;
 use App\Services\TokenService as TokenServiceInterface;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
     public function __construct(
         private readonly AuthServiceInterface $authService,
         private readonly TokenServiceInterface $tokenService,
-        private readonly RefreshToken $refreshToken
     )
     {
     }
@@ -29,7 +27,7 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $rules = [
-            'email' => 'bail|required',
+            'email' => 'required|email',
             'password' => 'required',
         ];
 
@@ -39,7 +37,7 @@ class AuthController extends Controller
             throw new InputValidationException($validator->getMessageBag()->toJson());
         }
 
-        return $this->authSuccess(
+        return $this->success(
             $this->authService->login($request->get('email'), $request->get('password'))
         );
     }
@@ -72,8 +70,8 @@ class AuthController extends Controller
             'last_name' => 'required|string',
             'id_document' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'repeat_password' => 'required|string|min:6|same:password',
+            'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+            'repeat_password' => 'required|same:password',
         ];
 
         $messages = [

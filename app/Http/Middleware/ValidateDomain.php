@@ -23,7 +23,7 @@ class ValidateDomain
         }
 
         if (!in_array(extract_domain($email), $allowedDomains)) {
-            return response()->json(['message' => 'Invalid data. Please try again'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['message' => 'Invalid data. Please try again.'], Response::HTTP_BAD_REQUEST);
         }
 
         return $next($request);
