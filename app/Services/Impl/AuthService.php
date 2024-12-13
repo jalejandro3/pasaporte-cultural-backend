@@ -8,7 +8,7 @@ use App\Services\AuthService as AuthServiceInterface;
 use App\Services\TokenService as TokenServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthService implements AuthServiceInterface
 {
@@ -21,16 +21,11 @@ class AuthService implements AuthServiceInterface
 
     public function login(string $email, string $password): array
     {
-        $user = $this->userRepository->findByEmail($email);
-
-        if (!$user) {
-            throw new ResourceNotFoundException('User not found.');
-        }
-
         if (!Auth::attempt(['email' => $email, 'password' => $password])) {
-            throw new ApplicationException('Wrong email or password, please verify your data.');
+            throw new ApplicationException('Wrong email or password, please verify your data.', Response::HTTP_BAD_REQUEST);
         }
 
+        $user = $this->userRepository->findByEmail($email);
         $accessToken = $this->tokenService->createAccessToken($user);
         $refreshToken = $this->tokenService->createRefreshToken($user);
 
