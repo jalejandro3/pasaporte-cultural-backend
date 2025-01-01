@@ -86,4 +86,66 @@ class AuthController extends Controller
 
         return $this->success($this->authService->register($request->all()));
     }
+
+    /**
+     * @throws InputValidationException|ApplicationException
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $rules = [
+            'email' => 'required|email',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->authService->forgotPassword($request->get('email')));
+    }
+
+    /**
+     * @throws InputValidationException
+     * @throws ApplicationException
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $rules = [
+            'token' => 'required|string',
+            'new_password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+            'repeat_password' => 'required|same:new_password',
+        ];
+
+        $messages = [
+            'repeat_password.same' => 'The password must match.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->authService->resetPassword($request->get('token'), $request->get('new_password')));
+    }
+
+    /**
+     * @throws InputValidationException
+     * @throws ApplicationException
+     */
+    public function validateToken(Request $request): JsonResponse
+    {
+        $rules = [
+            'token' => 'required|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->authService->validateToken($request->get('token')));
+    }
 }

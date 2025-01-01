@@ -20,18 +20,28 @@ use Illuminate\Support\Facades\Route;
 /**
  * AUTH
  */
-Route::post('auth/login', [AuthController::class, 'login']);
-Route::post('auth/refresh-token', [AuthController::class, 'refreshToken']);
-Route::middleware(['validate.domain', 'validate.role'])->post('auth/register', [AuthController::class, 'register']);
+Route::controller(AuthController::class)->group(function() {
+    Route::post('auth/login', 'login');
+    Route::post('auth/refresh-token', 'refreshToken');
+    Route::post('auth/register', 'register')->middleware(['validate.domain', 'validate.role']);
 
-Route::middleware('jwt')->group(function () {
     /**
-     * USERS
+     * PASSWORD
      */
-    Route::get('users/profile', [UserController::class, 'profile']);
-    Route::put('users/profile', [UserController::class, 'updateProfile'])->middleware('validate.domain');
-    Route::middleware('admin.user')->group(function () {
-        Route::put('users/{id}', [UserController::class, 'updateRole']);
-        Route::delete('users/{id}', [UserController::class, 'destroy']);
-    });
+    Route::post('auth/forgot-password', 'forgotPassword');
+    Route::post('auth/reset-password', 'resetPassword');
+    Route::post('auth/validate-token', 'validateToken');
 });
+
+/**
+ * USERS
+ */
+Route::controller(UserController::class)->group(function () {
+    Route::get('users/profile', 'profile');
+    Route::put('users/profile', 'updateProfile')->middleware('validate.domain');
+
+    Route::middleware('admin.user')->group(function () {
+        Route::put('users/{id}', 'updateRole');
+        Route::delete('users/{id}', 'destroy');
+    });
+})->middleware('jwt');
