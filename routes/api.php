@@ -41,6 +41,7 @@ Route::controller(UserController::class)->group(function () {
     Route::put('users/profile', 'updateProfile')->middleware('validate.domain');
 
     Route::middleware('admin.user')->group(function () {
+        Route::get('users', 'getAllUsers');
         Route::put('users/{id}', 'updateRole');
         Route::delete('users/{id}', 'destroy');
     });

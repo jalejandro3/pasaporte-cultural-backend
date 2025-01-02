@@ -4,6 +4,7 @@ namespace App\Repositories\Impl;
 
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\Paginator;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -29,5 +30,24 @@ class UserRepository implements UserRepositoryInterface
     public function findByIdDocument(string $idDocument): ?User
     {
         return $this->user->whereIdDocument($idDocument)->first();
+    }
+
+    public function findByFilters(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator
+    {
+        $query = $this->user->query();
+
+        foreach ($filters as $key => $value) {
+            $query->where($key, 'like', "%$value%");
+        }
+
+        $allowedSortFields = ['first_name', 'last_name', 'email', 'role'];
+
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'id';
+        }
+
+        $query->orderBy($sortBy, $sortOrder);
+
+        return $query->paginate($perPage);
     }
 }
