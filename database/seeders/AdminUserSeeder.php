@@ -14,13 +14,13 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'first_name' => 'Administardor',                
-            'last_name' => '',
-            'id_document' => '1122334455',
-            'email' => 'admin@comunidadunir.net',
+            'first_name' => 'Administrador',
+            'last_name' => 'Pasaporte Cultural',
+            'id_document' => '',
+            'email' => 'admin_pcu@comunidadunir.net',
             'email_verified_at' => now(),
-            'password' => Hash::make('Unir123$*'),
-            'role' => 'admin',
+            'password' => Hash::make('UnirPcu2025'),
+            'role' => User::ROLE_ADMIN,
         ]);
     }
 }
