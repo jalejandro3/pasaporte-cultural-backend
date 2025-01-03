@@ -40,12 +40,6 @@ class UserRepository implements UserRepositoryInterface
             $query->where($key, 'like', "%$value%");
         }
 
-        $allowedSortFields = ['first_name', 'last_name', 'email', 'role'];
-
-        if (!in_array($sortBy, $allowedSortFields)) {
-            $sortBy = 'id';
-        }
-
         $query->orderBy($sortBy, $sortOrder);
 
         return $query->paginate($perPage);

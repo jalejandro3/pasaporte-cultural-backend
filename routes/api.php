@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Route;
  */
 Route::controller(AuthController::class)->group(function() {
     Route::post('auth/login', 'login');
-    Route::post('auth/refresh-token', 'refreshToken');
     Route::post('auth/register', 'register')->middleware(['validate.domain', 'validate.role']);
 
     /**
@@ -30,6 +29,11 @@ Route::controller(AuthController::class)->group(function() {
      */
     Route::post('auth/forgot-password', 'forgotPassword');
     Route::post('auth/reset-password', 'resetPassword');
+
+    /**
+     * TOKEN
+     */
+    Route::post('auth/refresh-token', 'refreshToken');
     Route::post('auth/validate-token', 'validateToken');
 });
 
