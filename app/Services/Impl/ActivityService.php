@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\ActivityService as ActivityServiceInterface;
 use App\Services\QrCodeService as QrCodeServiceInterface;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 class ActivityService implements ActivityServiceInterface
@@ -26,6 +27,11 @@ class ActivityService implements ActivityServiceInterface
 
             return ['message' => 'Activity created successfully.'];
         });
+    }
+
+    public function getAllActivities(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator
+    {
+        return $this->activityRepository->findByFilters($filters, $perPage, $sortBy, $sortOrder);
     }
 
     public function show(string $token, string $id): array
