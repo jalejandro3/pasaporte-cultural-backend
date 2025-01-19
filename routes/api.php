@@ -1,9 +1,8 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\AdminUser;
-use App\Http\Middleware\Jwt;
 use Illuminate\Support\Facades\Route;
 
 /*
