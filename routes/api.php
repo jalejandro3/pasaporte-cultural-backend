@@ -21,7 +21,10 @@ use Illuminate\Support\Facades\Route;
  */
 Route::controller(ActivityController::class)->group(function() {
     Route::get('activities/{id}', 'show');
-    Route::post('activities', 'create')->middleware('validate.role');
+
+    Route::middleware('admin.user')->group(function () {
+        Route::post('activities', 'create');
+    });
 });
 
 /**
