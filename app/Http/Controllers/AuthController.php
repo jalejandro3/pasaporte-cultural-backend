@@ -9,6 +9,7 @@ use App\Services\TokenService as TokenServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -26,7 +27,7 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $rules = [
-            'email' => 'bail|required',
+            'email' => 'required|email',
             'password' => 'required',
         ];
 
@@ -36,7 +37,7 @@ class AuthController extends Controller
             throw new InputValidationException($validator->getMessageBag()->toJson());
         }
 
-        return $this->authSuccess(
+        return $this->success(
             $this->authService->login($request->get('email'), $request->get('password'))
         );
     }
@@ -69,8 +70,8 @@ class AuthController extends Controller
             'last_name' => 'required|string',
             'id_document' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'repeat_password' => 'required|string|min:6|same:password',
+            'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+            'repeat_password' => 'required|same:password',
         ];
 
         $messages = [
@@ -84,5 +85,67 @@ class AuthController extends Controller
         }
 
         return $this->success($this->authService->register($request->all()));
+    }
+
+    /**
+     * @throws InputValidationException|ApplicationException
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $rules = [
+            'email' => 'required|email',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->authService->forgotPassword($request->get('email')));
+    }
+
+    /**
+     * @throws InputValidationException
+     * @throws ApplicationException
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $rules = [
+            'token' => 'required|string',
+            'new_password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+            'repeat_password' => 'required|same:new_password',
+        ];
+
+        $messages = [
+            'repeat_password.same' => 'The password must match.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->authService->resetPassword($request->get('token'), $request->get('new_password')));
+    }
+
+    /**
+     * @throws InputValidationException
+     * @throws ApplicationException
+     */
+    public function validateToken(Request $request): JsonResponse
+    {
+        $rules = [
+            'token' => 'required|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->authService->validateToken($request->get('token')));
     }
 }
