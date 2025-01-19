@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 /**
+ * ACTIVITIES
+ */
+Route::controller(ActivityController::class)->group(function() {
+    Route::get('activities/{id}', 'show');
+    Route::post('activities', 'create')->middleware('validate.role');
+});
+
+/**
  * AUTH
  */
 Route::controller(AuthController::class)->group(function() {
