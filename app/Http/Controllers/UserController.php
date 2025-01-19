@@ -52,9 +52,14 @@ class UserController extends Controller
         $rules = [
             'email' => 'email',
             'password' => Password::min(8)->mixedCase()->numbers(),
+            'repeat_password' => 'same:password',
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $messages = [
+            'repeat_password.same' => 'The password must match.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             throw new InputValidationException($validator->getMessageBag()->toJson());
