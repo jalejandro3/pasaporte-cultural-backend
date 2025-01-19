@@ -22,7 +22,7 @@ class ValidateDomain
             return response()->json(['message' => 'No valid domains were configured.'], Response::HTTP_BAD_REQUEST);
         }
 
-        if (!in_array(extract_domain($email), $allowedDomains)) {
+        if ($email && !in_array(extract_domain($email), $allowedDomains)) {
             return response()->json(['message' => 'Invalid data. Please try again.'], Response::HTTP_BAD_REQUEST);
         }
 
