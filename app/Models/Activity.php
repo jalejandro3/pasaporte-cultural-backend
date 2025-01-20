@@ -17,7 +17,9 @@ class Activity extends Model
         'country',
         'city',
         'address',
-        'total_hours',
+        'duration',
+        'started_at',
+        'finished_at',
     ];
 
     public function qrCodes(): HasMany
@@ -28,5 +30,12 @@ class Activity extends Model
     public function activeQrCode(): HasOne
     {
         return $this->hasOne(QrCode::class)->where('active', true);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_activity')
+            ->withPivot('status', 'started_at', 'finished_at')
+            ->withTimestamps();
     }
 }

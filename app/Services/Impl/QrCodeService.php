@@ -17,7 +17,11 @@ class QrCodeService implements QrCodeServiceInterface
 
     public function generateCode(Activity $activity): QrCode
     {
-        $content = json_encode($activity->toArray());
+        $content = json_encode([
+            'activity_id' => $activity->id,
+            'token' => $this->generateToken($activity->id),
+        ]);
+
         $publicStorage = Storage::disk('public');
 
         if (!$publicStorage->exists(self::QR_CODE_PATH)) {
@@ -35,5 +39,19 @@ class QrCodeService implements QrCodeServiceInterface
             'activity_id' => $activity->id,
             'path' => 'storage' . DIRECTORY_SEPARATOR . $filePath,
         ]);
+    }
+
+    private function generateToken(int $activityId): string
+    {
+        $secret = config('qr.secret');
+        $payload = [
+            'activity_id' => $activityId,
+            'timestamp' => now()->timestamp,
+        ];
+
+        $payloadString = json_encode($payload);
+        $hash =  hash_hmac('sha256', $payloadString, $secret);
+
+        return base64_encode($payloadString . '.' . $hash);
     }
 }

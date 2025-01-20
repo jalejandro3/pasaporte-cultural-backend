@@ -26,7 +26,7 @@ class ActivityController extends Controller
             'country' => 'required|string',
             'city' => 'required|string',
             'address' => 'required|string',
-            'total_hours' => 'required|string',
+            'duration' => 'required|string',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -66,5 +66,23 @@ class ActivityController extends Controller
         $sortOrder = $request->input('sort_order', 'asc');
 
         return $this->activityService->getAllActivities($filters, $perPage, $sortBy, $sortOrder);
+    }
+
+    /**
+     * @throws InputValidationException
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $rules = [
+            'activity_id' => 'required|exists:activities,id',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->register($request->get('activity_id'), $request->bearerToken()));
     }
 }
