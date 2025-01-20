@@ -2,10 +2,14 @@
 
 namespace App\Services\Impl;
 
-use App\Models\User;
+use App\Enums\ActivityStatus;
+use App\Enums\UserRoles;
+use App\Exceptions\ApplicationException;
+use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\ActivityService as ActivityServiceInterface;
 use App\Services\QrCodeService as QrCodeServiceInterface;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
+use App\Workflows\ActivityWorkflow;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +17,8 @@ class ActivityService implements ActivityServiceInterface
 {
     public function __construct(
         private readonly ActivityRepositoryInterface $activityRepository,
-        private readonly QrCodeServiceInterface $qrCodeService
+        private readonly QrCodeServiceInterface $qrCodeService,
+        private readonly UserRepositoryInterface $userRepository
     )
     {
     }
@@ -41,10 +46,57 @@ class ActivityService implements ActivityServiceInterface
         $activity = $this->activityRepository->findById($id);
         $data = $activity->toArray();
 
-        if (User::ROLE_ADMIN === $decoded->data->role) {
+        if (UserRoles::ADMIN === $decoded->data->role) {
             $data['qr_code_url'] = $activity->activeQrCode->url ?? null;
         }
 
         return $data;
+    }
+
+    /**
+     * @throws ApplicationException
+     */
+    public function register(int $activityId, string $token): array
+    {
+        $decoded = jwt_decode_token($token);
+        $user = $this->userRepository->findById($decoded->data->id);
+
+        $activity = $user->activities()->where('activity_id', $activityId)->first();
+        $pivotData = $activity?->pivot;
+
+        if (!$pivotData) {
+            $user->activities()->attach($activityId, ['started_at' => now()]);
+
+            return ['message' => 'Activity registered successfully.'];
+        }
+
+        if (in_array($pivotData->status, [ActivityStatus::COMPLETED, ActivityStatus::NOT_COMPLETED])) {
+            throw new ApplicationException('You cannot scan this activity again. You have already completed it.');
+        }
+
+        if ($pivotData->started_at && !$pivotData->finished_at) {
+            $newStatus = $this->determineCompletionStatus(
+                $pivotData->started_at,
+                now()->format('Y-m-d H:i:s'),
+                $activity->duration
+            );
+
+            ActivityWorkflow::ensureTransitionIsValid(ActivityStatus::IN_PROGRESS, $newStatus);
+
+            $user->activities()->updateExistingPivot($activityId, [
+                'finished_at' => now(),
+                'status' => $newStatus,
+            ]);
+
+            return ['message' => 'Activity finished successfully.'];
+        }
+    }
+
+    private function determineCompletionStatus(string $startedAt, string $finishedAt, string $activityDuration): string
+    {
+        $requiredDuration = $activityDuration * 3600;
+        $actualDuration = strtotime($finishedAt) - strtotime($startedAt);
+
+        return $actualDuration >= $requiredDuration ? ActivityStatus::COMPLETED : ActivityStatus::NOT_COMPLETED;
     }
 }

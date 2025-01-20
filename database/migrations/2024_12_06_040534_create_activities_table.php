@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('country');
             $table->string('city');
             $table->string('address');
-            $table->string('total_hours');
+            $table->string('duration');
             $table->timestamps();
         });
     }
