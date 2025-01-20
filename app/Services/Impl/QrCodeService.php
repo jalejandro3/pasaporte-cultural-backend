@@ -12,6 +12,7 @@ class QrCodeService implements QrCodeServiceInterface
 {
     public const QR_CODE_PATH = 'qrcodes';
     public const QR_CODE_SIZE = 300;
+    public const QR_CODE_MARGIN = 2;
     public const QR_CODE_FORMAT = 'png';
     public const QR_CODE_EXTENSION = '.png';
 
@@ -32,6 +33,7 @@ class QrCodeService implements QrCodeServiceInterface
         $filePath = self::QR_CODE_PATH . DIRECTORY_SEPARATOR . $filename;
 
         QrCodeGenerator::format(self::QR_CODE_FORMAT)
+            ->margin(self::QR_CODE_MARGIN)
             ->size(self::QR_CODE_SIZE)
             ->generate($content, $publicStorage->path($filePath));
 
