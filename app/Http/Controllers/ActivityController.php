@@ -26,10 +26,14 @@ class ActivityController extends Controller
             'country' => 'required|string',
             'city' => 'required|string',
             'address' => 'required|string',
-            'duration' => 'required|string',
+            'duration' => 'required|integer|min:1',
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $messages = [
+            'duration' => 'The duration must be at least 1 hour.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             throw new InputValidationException($validator->getMessageBag()->toJson());
