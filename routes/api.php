@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,14 @@ Route::controller(AuthController::class)->group(function() {
     Route::post('auth/refresh-token', 'refreshToken');
     Route::post('auth/validate-token', 'validateToken');
 });
+
+/**
+ * LOCATIONS
+ */
+Route::controller(LocationController::class)->group(function () {
+    Route::get('/countries', 'getCountries');
+    Route::get('/countries/{id}/cities', 'getCities');
+})->middleware('jwt');
 
 /**
  * USERS
