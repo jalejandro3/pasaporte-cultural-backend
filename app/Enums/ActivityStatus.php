@@ -2,18 +2,23 @@
 
 namespace App\Enums;
 
-enum ActivityStatus
+enum ActivityStatus:string
 {
-    public const IN_PROGRESS = 'in_progress';
-    public const COMPLETED = 'completed';
-    public const NOT_COMPLETED = 'not_completed';
+    case IN_PROGRESS = 'in_progress';
+    case COMPLETED = 'completed';
+    case NOT_COMPLETED = 'not_completed';
 
     public static function getValues(): array
     {
-        return [
-            self::IN_PROGRESS,
-            self::COMPLETED,
-            self::NOT_COMPLETED
-        ];
+        return array_column(self::cases(), 'value');
+    }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::IN_PROGRESS => 'En Progreso',
+            self::COMPLETED => 'Completado',
+            self::NOT_COMPLETED => 'No Completado',
+        };
     }
 }

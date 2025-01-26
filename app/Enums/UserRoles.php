@@ -2,16 +2,21 @@
 
 namespace App\Enums;
 
-enum UserRoles
+enum UserRoles: string
 {
-    public const ADMIN = 'admin';
-    public const ASSISTANT = 'assistant';
+    case ADMIN = 'admin';
+    case ASSISTANT = 'assistant';
 
     public static function getValues(): array
     {
-        return [
-            self::ADMIN,
-            self::ASSISTANT
-        ];
+        return array_column(self::cases(), 'value');
+    }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::ADMIN => 'Administrador',
+            self::ASSISTANT => 'Asistente',
+        };
     }
 }

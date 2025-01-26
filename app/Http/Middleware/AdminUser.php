@@ -26,7 +26,7 @@ class AdminUser
 
             $decoded = jwt_decode_token($token);
 
-            if (UserRoles::ADMIN !== $decoded->data->role) {
+            if (UserRoles::ADMIN->value !== $decoded->data->role) {
                 return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
             }
         } catch (Exception $e) {
