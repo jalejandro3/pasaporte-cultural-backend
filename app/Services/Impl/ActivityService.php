@@ -46,7 +46,7 @@ class ActivityService implements ActivityServiceInterface
         $activity = $this->activityRepository->findById($id);
         $data = $activity->toArray();
 
-        if (UserRoles::ADMIN === $decoded->data->role) {
+        if (UserRoles::ADMIN->value === $decoded->data->role) {
             $data['qr_code_url'] = $activity->activeQrCode->url ?? null;
         }
 
@@ -70,7 +70,7 @@ class ActivityService implements ActivityServiceInterface
             return ['message' => 'Activity registered successfully.'];
         }
 
-        if (in_array($pivotData->status, [ActivityStatus::COMPLETED, ActivityStatus::NOT_COMPLETED])) {
+        if (in_array($pivotData->status, [ActivityStatus::COMPLETED->value, ActivityStatus::NOT_COMPLETED->value])) {
             throw new ApplicationException('You cannot scan this activity again. You have already completed it.');
         }
 
@@ -81,7 +81,7 @@ class ActivityService implements ActivityServiceInterface
                 $activity->duration
             );
 
-            ActivityWorkflow::ensureTransitionIsValid(ActivityStatus::IN_PROGRESS, $newStatus);
+            ActivityWorkflow::ensureTransitionIsValid(ActivityStatus::IN_PROGRESS->value, $newStatus);
 
             $user->activities()->updateExistingPivot($activityId, [
                 'finished_at' => now(),
@@ -97,6 +97,6 @@ class ActivityService implements ActivityServiceInterface
         $requiredDuration = $activityDuration * 3600;
         $actualDuration = strtotime($finishedAt) - strtotime($startedAt);
 
-        return $actualDuration >= $requiredDuration ? ActivityStatus::COMPLETED : ActivityStatus::NOT_COMPLETED;
+        return $actualDuration >= $requiredDuration ? ActivityStatus::COMPLETED->value : ActivityStatus::NOT_COMPLETED->value;
     }
 }
