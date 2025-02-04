@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('activity_id')->unsigned();
-            $table->enum('status', ActivityStatus::getValues())->default(ActivityStatus::IN_PROGRESS);
+            $table->enum('status', ActivityStatus::getValues())->default(ActivityStatus::IN_PROGRESS->value);
             $table->timestamp('started_at')->nullable()->default(null);
             $table->timestamp('finished_at')->nullable()->default(null);
             $table->timestamps();

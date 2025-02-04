@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
+use App\Enums\UserRoles;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,7 @@ class ValidateRole
     {
         $role = $request->get('role');
 
-        if (!$role || !in_array($role, User::getRoles())) {
+        if (!$role || !in_array($role, UserRoles::getValues())) {
             return response()->json(['message' => 'Invalid role.'], Response::HTTP_BAD_REQUEST);
         }
 

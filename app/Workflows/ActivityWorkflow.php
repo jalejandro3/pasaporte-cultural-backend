@@ -8,9 +8,9 @@ use InvalidArgumentException;
 class ActivityWorkflow
 {
     private const TRANSITIONS = [
-        ActivityStatus::IN_PROGRESS => [
-            ActivityStatus::COMPLETED,
-            ActivityStatus::NOT_COMPLETED
+        ActivityStatus::IN_PROGRESS->value => [
+            ActivityStatus::COMPLETED->value,
+            ActivityStatus::NOT_COMPLETED->value
         ]
     ];
 
