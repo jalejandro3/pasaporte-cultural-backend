@@ -8,4 +8,5 @@ use App\Models\QrCode;
 interface QrCodeService
 {
     public function generateCode(Activity $activity): QrCode;
+    public function regenerateCode(int $activityId): array;
 }
