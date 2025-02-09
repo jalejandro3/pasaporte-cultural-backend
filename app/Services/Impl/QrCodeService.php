@@ -61,6 +61,12 @@ class QrCodeService implements QrCodeServiceInterface
             throw new ResourceNotFoundException('There is not an active qr code.');
         }
 
+        $activeQrCode = $activity->activeQrCode;
+
+        $activeQrCode
+            ->setAttribute('active', false)
+            ->save();
+
         $this->generateCode($activity);
 
         return ['message' => 'QR code regenerated successfully.'];
