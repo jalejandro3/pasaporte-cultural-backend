@@ -36,4 +36,14 @@ class ActivityRepository implements ActivityRepositoryInterface
 
         return $query->paginate($perPage);
     }
+
+    public function findEnrolledByUser(int $perPage, int $userId): Paginator
+    {
+        $query = $this->activity->query();
+
+        return $query->join('user_activity', 'activities.id', '=', 'user_activity.activity_id')
+            ->where('user_activity.user_id', $userId)
+            ->select('activities.id', 'activities.title', 'activities.duration', 'user_activity.status')
+            ->paginate($perPage);
+    }
 }

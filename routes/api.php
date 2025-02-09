@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Route;
  * ACTIVITIES
  */
 Route::controller(ActivityController::class)->group(function() {
-    Route::get('activities/{id}', 'show');
-    Route::get('me/activities', 'getUserActivities');
+    Route::get('activities/enrolled', 'getEnrolledActivities');
+    Route::get('activities/{id}', 'show')->where('id', '[0-9]+');
     Route::get('activities', 'getAllActivities');
     Route::post('activities/register', 'register')->middleware('validate.qr');
 

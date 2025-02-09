@@ -12,6 +12,7 @@ use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use App\Workflows\ActivityWorkflow;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class ActivityService implements ActivityServiceInterface
 {
@@ -39,7 +40,19 @@ class ActivityService implements ActivityServiceInterface
         return $this->activityRepository->findByFilters($filters, $perPage, $sortBy, $sortOrder);
     }
 
-    public function show(string $token, string $id): array
+    public function getEnrolledActivities(int $perPage, string $token): Paginator
+    {
+        $decoded = jwt_decode_token($token);
+        $user = $this->userRepository->findById($decoded->data->id);
+
+        if (!$user) {
+            throw new ResourceNotFoundException('User not found.');
+        }
+
+        return $this->activityRepository->findEnrolledByUser($perPage, $user->id);
+    }
+
+    public function show(string $token, int $id): array
     {
         $decoded = jwt_decode_token($token);
 
