@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRoles;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class AdminUserSeeder extends Seeder
 {
@@ -20,7 +21,7 @@ class AdminUserSeeder extends Seeder
             'email' => 'admin_pcu@comunidadunir.net',
             'email_verified_at' => now(),
             'password' => Hash::make('UnirPcu2025'),
-            'role' => User::ROLE_ADMIN,
+            'role' => UserRoles::ADMIN->value,
         ]);
     }
 }

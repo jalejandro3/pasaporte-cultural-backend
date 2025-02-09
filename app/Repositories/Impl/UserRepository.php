@@ -12,9 +12,11 @@ class UserRepository implements UserRepositoryInterface
     {
     }
 
-    public function create(array $data): bool
+    public function create(array $data): User
     {
-        return $this->user->fill($data)->save();
+        return tap(new User($data), function ($user) {
+            $user->save();
+        });
     }
 
     public function findById(int $id): ?User

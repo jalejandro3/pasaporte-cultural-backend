@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
+use App\Enums\UserRoles;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class AdminUser
 
             $decoded = jwt_decode_token($token);
 
-            if (User::ROLE_ADMIN !== $decoded->data->role) {
+            if (UserRoles::ADMIN->value !== $decoded->data->role) {
                 return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
             }
         } catch (Exception $e) {
