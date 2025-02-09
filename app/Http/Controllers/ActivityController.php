@@ -42,11 +42,6 @@ class ActivityController extends Controller
         return $this->success($this->activityService->create($request->all()));
     }
 
-    public function show(Request $request, string $id): JsonResponse
-    {
-        return $this->success($this->activityService->show($request->bearerToken(), $id));
-    }
-
     /**
      * @throws InputValidationException
      */
@@ -75,6 +70,26 @@ class ActivityController extends Controller
     /**
      * @throws InputValidationException
      */
+    public function getEnrolledActivities(Request $request): Paginator
+    {
+        $rules = [
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        $perPage = $request->input('per_page', 10);
+
+        return $this->activityService->getEnrolledActivities($perPage, $request->bearerToken());
+    }
+
+    /**
+     * @throws InputValidationException
+     */
     public function register(Request $request): JsonResponse
     {
         $rules = [
@@ -88,5 +103,10 @@ class ActivityController extends Controller
         }
 
         return $this->success($this->activityService->register($request->get('activity_id'), $request->bearerToken()));
+    }
+
+    public function show(Request $request, int $id): JsonResponse
+    {
+        return $this->success($this->activityService->show($request->bearerToken(), $id));
     }
 }
