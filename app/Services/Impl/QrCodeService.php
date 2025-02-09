@@ -4,9 +4,11 @@ namespace App\Services\Impl;
 
 use App\Models\Activity;
 use App\Models\QrCode;
+use App\Repositories\ActivityRepository;
 use App\Services\QrCodeService as QrCodeServiceInterface;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode as QrCodeGenerator;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class QrCodeService implements QrCodeServiceInterface
 {
@@ -15,6 +17,10 @@ class QrCodeService implements QrCodeServiceInterface
     public const QR_CODE_MARGIN = 2;
     public const QR_CODE_FORMAT = 'png';
     public const QR_CODE_EXTENSION = '.png';
+
+    public function __construct(private readonly ActivityRepository $activityRepository)
+    {
+    }
 
     public function generateCode(Activity $activity): QrCode
     {
@@ -37,10 +43,27 @@ class QrCodeService implements QrCodeServiceInterface
             ->size(self::QR_CODE_SIZE)
             ->generate($content, $publicStorage->path($filePath));
 
-        return QrCode::create([
+        return QrCode::updateOrCreate([
             'activity_id' => $activity->id,
             'path' => 'storage' . DIRECTORY_SEPARATOR . $filePath,
         ]);
+    }
+
+    public function regenerateCode(int $activityId): array
+    {
+        $activity = $this->activityRepository->findById($activityId);
+
+        if (!$activity) {
+            throw new ResourceNotFoundException('Activity not found.');
+        }
+
+        if (!$activity->activeQrCode) {
+            throw new ResourceNotFoundException('There is not an active qr code.');
+        }
+
+        $this->generateCode($activity);
+
+        return ['message' => 'QR code regenerated successfully.'];
     }
 
     private function generateToken(int $activityId): string
