@@ -5,12 +5,14 @@ namespace App\Services\Impl;
 use App\Enums\ActivityStatus;
 use App\Enums\UserRoles;
 use App\Exceptions\ApplicationException;
+use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\ActivityService as ActivityServiceInterface;
 use App\Services\QrCodeService as QrCodeServiceInterface;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use App\Workflows\ActivityWorkflow;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
@@ -33,6 +35,27 @@ class ActivityService implements ActivityServiceInterface
 
             return ['message' => 'Activity created successfully.'];
         });
+    }
+
+    public function getActivityAttendance(?string $search): array
+    {
+        $user = $this->userRepository->findBySearchTerm($search);
+
+        if (!$user instanceof User) {
+            throw new ResourceNotFoundException('User not found.');
+        }
+
+        $activities = $this->activityRepository->findByUser($user->id);
+
+        return [
+            'user' => [
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'id_document' => $user->id_document,
+            ],
+            'activities' => $activities->isEmpty() ? [] : $activities->toArray(),
+        ];
     }
 
     public function getAllActivities(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator

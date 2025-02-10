@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 interface UserRepository
 {
@@ -12,4 +14,5 @@ interface UserRepository
     public function findByEmail(string $email): ?User;
     public function findByIdDocument(string $idDocument): ?User;
     public function findByFilters(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator;
+    public function findBySearchTerm(?string $search): Builder|Model;
 }
