@@ -33,7 +33,7 @@ Route::controller(ActivityController::class)->group(function() {
         /**
          * ADMINISTRATIVE
          */
-        Route::get('activities/attendance', 'getActivityAttendance');
+        Route::get('activities/user', 'getActivityUser');
     });
 })->middleware('jwt');
 
