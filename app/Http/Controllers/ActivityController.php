@@ -45,6 +45,24 @@ class ActivityController extends Controller
     /**
      * @throws InputValidationException
      */
+    public function getActivityAttendance(Request $request): JsonResponse
+    {
+        $rules = [
+            'search' => 'nullable|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->getActivityAttendance($request->get('search')));
+    }
+
+    /**
+     * @throws InputValidationException
+     */
     public function getAllActivities(Request $request): Paginator
     {
         $rules = [

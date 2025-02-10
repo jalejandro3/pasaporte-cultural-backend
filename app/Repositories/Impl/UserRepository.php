@@ -4,6 +4,8 @@ namespace App\Repositories\Impl;
 
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Pagination\Paginator;
 
 class UserRepository implements UserRepositoryInterface
@@ -45,5 +47,15 @@ class UserRepository implements UserRepositoryInterface
         $query->orderBy($sortBy, $sortOrder);
 
         return $query->paginate($perPage);
+    }
+
+    public function findBySearchTerm(?string $search): Builder|Model
+    {
+        $query = $this->user->query();
+
+        $query->where('email', 'like', "%$search%")
+            ->orWhere('id_document', 'like', "%$search%");
+
+        return $query->first();
     }
 }

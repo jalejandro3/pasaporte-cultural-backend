@@ -5,6 +5,7 @@ namespace App\Repositories\Impl;
 use App\Models\Activity;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class ActivityRepository implements ActivityRepositoryInterface
 {
@@ -19,7 +20,23 @@ class ActivityRepository implements ActivityRepositoryInterface
         });
     }
 
-    public function findById(string $id): ?Activity
+    public function findByUser(int $userId): Collection
+    {
+        $query = $this->activity->query();
+
+        return $query
+            ->join('user_activity', 'activities.id', '=', 'user_activity.activity_id')
+            ->where('user_activity.user_id', $userId)
+            ->select(
+                'activities.id',
+                'activities.title',
+                'activities.duration',
+                'user_activity.status'
+            )
+            ->get();
+    }
+
+    public function findById(int $id): ?Activity
     {
         return $this->activity->find($id);
     }

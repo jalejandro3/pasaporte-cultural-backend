@@ -29,6 +29,11 @@ Route::controller(ActivityController::class)->group(function() {
 
     Route::middleware('admin.user')->group(function () {
         Route::post('activities', 'create');
+
+        /**
+         * ADMINISTRATIVE
+         */
+        Route::get('activities/attendance', 'getActivityAttendance');
     });
 })->middleware('jwt');
 
