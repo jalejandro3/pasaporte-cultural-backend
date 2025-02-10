@@ -45,7 +45,7 @@ class ActivityController extends Controller
     /**
      * @throws InputValidationException
      */
-    public function getActivityAttendance(Request $request): JsonResponse
+    public function getActivityUser(Request $request): JsonResponse
     {
         $rules = [
             'search' => 'nullable|string',
@@ -57,7 +57,7 @@ class ActivityController extends Controller
             throw new InputValidationException($validator->getMessageBag()->toJson());
         }
 
-        return $this->success($this->activityService->getActivityAttendance($request->get('search')));
+        return $this->success($this->activityService->getActivityUser($request->get('search')));
     }
 
     /**

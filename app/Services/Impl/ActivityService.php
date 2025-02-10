@@ -12,7 +12,6 @@ use App\Services\QrCodeService as QrCodeServiceInterface;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use App\Workflows\ActivityWorkflow;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
@@ -37,7 +36,7 @@ class ActivityService implements ActivityServiceInterface
         });
     }
 
-    public function getActivityAttendance(?string $search): array
+    public function getActivityUser(?string $search): array
     {
         $user = $this->userRepository->findBySearchTerm($search);
 
@@ -100,10 +99,12 @@ class ActivityService implements ActivityServiceInterface
         $activity = $user->activities()->where('activity_id', $activityId)->first();
         $pivotData = $activity?->pivot;
 
+        $msg = [];
+
         if (!$pivotData) {
             $user->activities()->attach($activityId, ['started_at' => now()]);
 
-            return ['message' => 'Activity registered successfully.'];
+            $msg['message'] = 'Activity registered successfully.';
         }
 
         if (in_array($pivotData->status, [ActivityStatus::COMPLETED->value, ActivityStatus::NOT_COMPLETED->value])) {
@@ -124,8 +125,10 @@ class ActivityService implements ActivityServiceInterface
                 'status' => $newStatus,
             ]);
 
-            return ['message' => 'Activity finished successfully.'];
+            $msg['message'] = 'Activity finished successfully.';
         }
+
+        return $msg;
     }
 
     private function determineCompletionStatus(string $startedAt, string $finishedAt, string $activityDuration): string
