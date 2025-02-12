@@ -42,6 +42,21 @@ class ActivityController extends Controller
         return $this->success($this->activityService->create($request->all()));
     }
 
+    public function getActivityAttendance(Request $request): JsonResponse
+    {
+        $rules = [
+            'search' => 'nullable|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->getActivityAttendance($request->get('search')));
+    }
+
     /**
      * @throws InputValidationException
      */

@@ -34,6 +34,7 @@ Route::controller(ActivityController::class)->group(function() {
          * ADMINISTRATIVE
          */
         Route::get('activities/user', 'getActivityUser');
+        Route::get('activities/attendance', 'getActivityAttendance');
     });
 })->middleware('jwt');
 

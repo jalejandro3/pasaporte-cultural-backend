@@ -5,6 +5,7 @@ namespace App\Services\Impl;
 use App\Enums\ActivityStatus;
 use App\Enums\UserRoles;
 use App\Exceptions\ApplicationException;
+use App\Models\Activity;
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\ActivityService as ActivityServiceInterface;
@@ -34,6 +35,22 @@ class ActivityService implements ActivityServiceInterface
 
             return ['message' => 'Activity created successfully.'];
         });
+    }
+
+    public function getActivityAttendance(?string $search): array
+    {
+        $activity = $this->activityRepository->findBySearchTerm($search);
+
+        if (!$activity instanceof Activity) {
+            throw new ResourceNotFoundException('Activity not found.');
+        }
+
+        $users = $this->userRepository->findByActivity($activity->id);
+
+        return [
+            'activity' => ['title' => $activity->title,],
+            'users' => $users->isEmpty() ? [] : $users->toArray(),
+        ];
     }
 
     public function getActivityUser(?string $search): array
