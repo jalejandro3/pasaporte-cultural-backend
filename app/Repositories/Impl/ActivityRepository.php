@@ -5,7 +5,9 @@ namespace App\Repositories\Impl;
 use App\Models\Activity;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class ActivityRepository implements ActivityRepositoryInterface
 {
@@ -52,6 +54,15 @@ class ActivityRepository implements ActivityRepositoryInterface
         $query->orderBy($sortBy, $sortOrder);
 
         return $query->paginate($perPage);
+    }
+
+    public function findBySearchTerm(?string $search): Builder|Model
+    {
+        $query = $this->activity->query();
+
+        $query->where('title', 'like', "%$search%");
+
+        return $query->first();
     }
 
     public function findEnrolledByUser(int $perPage, int $userId): Paginator
