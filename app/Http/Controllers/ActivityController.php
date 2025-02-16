@@ -45,7 +45,7 @@ class ActivityController extends Controller
     public function getActivityAttendance(Request $request): JsonResponse
     {
         $rules = [
-            'search' => 'nullable|string',
+            'activity_id' => 'nullable|integer|exists:activities,id',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -54,7 +54,7 @@ class ActivityController extends Controller
             throw new InputValidationException($validator->getMessageBag()->toJson());
         }
 
-        return $this->success($this->activityService->getActivityAttendance($request->get('search')));
+        return $this->success($this->activityService->getActivityAttendance($request->get('activity_id')));
     }
 
     /**

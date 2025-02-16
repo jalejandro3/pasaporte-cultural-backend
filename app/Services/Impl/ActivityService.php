@@ -37,9 +37,9 @@ class ActivityService implements ActivityServiceInterface
         });
     }
 
-    public function getActivityAttendance(?string $search): array
+    public function getActivityAttendance(?int $activityId): array
     {
-        $activity = $this->activityRepository->findBySearchTerm($search);
+        $activity = $this->activityRepository->findById($activityId);
 
         if (!$activity instanceof Activity) {
             throw new ResourceNotFoundException('Activity not found.');
