@@ -79,6 +79,11 @@ class ActivityService implements ActivityServiceInterface
         return $this->activityRepository->findByFilters($filters, $perPage, $sortBy, $sortOrder);
     }
 
+    public function getAutocompleteSearch(?string $q): array
+    {
+        return $this->activityRepository->findByQuery($q)->toArray();
+    }
+
     public function getEnrolledActivities(int $perPage, string $token): Paginator
     {
         $decoded = jwt_decode_token($token);

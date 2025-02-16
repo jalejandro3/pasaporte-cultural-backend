@@ -103,6 +103,24 @@ class ActivityController extends Controller
     /**
      * @throws InputValidationException
      */
+    public function getAutocompleteSearch(Request $request): JsonResponse
+    {
+        $rules = [
+            'q' => 'nullable|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->getAutocompleteSearch($request->get('q')));
+    }
+
+    /**
+     * @throws InputValidationException
+     */
     public function getEnrolledActivities(Request $request): Paginator
     {
         $rules = [
