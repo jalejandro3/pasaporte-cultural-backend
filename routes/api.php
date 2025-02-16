@@ -28,7 +28,14 @@ Route::controller(ActivityController::class)->group(function() {
     Route::post('activities/register', 'register')->middleware('validate.qr');
 
     Route::middleware('admin.user')->group(function () {
+        Route::get('activities/autocomplete', 'getAutocompleteSearch');
         Route::post('activities', 'create');
+
+        /**
+         * ADMINISTRATIVE
+         */
+        Route::get('activities/user', 'getActivityUser');
+        Route::get('activities/attendance', 'getActivityAttendance');
     });
 })->middleware('jwt');
 

@@ -5,6 +5,8 @@ namespace App\Services\Impl;
 use App\Enums\ActivityStatus;
 use App\Enums\UserRoles;
 use App\Exceptions\ApplicationException;
+use App\Models\Activity;
+use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\ActivityService as ActivityServiceInterface;
 use App\Services\QrCodeService as QrCodeServiceInterface;
@@ -35,9 +37,51 @@ class ActivityService implements ActivityServiceInterface
         });
     }
 
+    public function getActivityAttendance(?int $activityId): array
+    {
+        $activity = $this->activityRepository->findById($activityId);
+
+        if (!$activity instanceof Activity) {
+            throw new ResourceNotFoundException('Activity not found.');
+        }
+
+        $users = $this->userRepository->findByActivity($activity->id);
+
+        return [
+            'activity' => ['title' => $activity->title,],
+            'users' => $users->isEmpty() ? [] : $users->toArray(),
+        ];
+    }
+
+    public function getActivityUser(?string $search): array
+    {
+        $user = $this->userRepository->findBySearchTerm($search);
+
+        if (!$user instanceof User) {
+            throw new ResourceNotFoundException('User not found.');
+        }
+
+        $activities = $this->activityRepository->findByUser($user->id);
+
+        return [
+            'user' => [
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'id_document' => $user->id_document,
+            ],
+            'activities' => $activities->isEmpty() ? [] : $activities->toArray(),
+        ];
+    }
+
     public function getAllActivities(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator
     {
         return $this->activityRepository->findByFilters($filters, $perPage, $sortBy, $sortOrder);
+    }
+
+    public function getAutocompleteSearch(?string $q): array
+    {
+        return $this->activityRepository->findByQuery($q)->toArray();
     }
 
     public function getEnrolledActivities(int $perPage, string $token): Paginator
@@ -77,10 +121,12 @@ class ActivityService implements ActivityServiceInterface
         $activity = $user->activities()->where('activity_id', $activityId)->first();
         $pivotData = $activity?->pivot;
 
+        $msg = [];
+
         if (!$pivotData) {
             $user->activities()->attach($activityId, ['started_at' => now()]);
 
-            return ['message' => 'Activity registered successfully.'];
+            $msg['message'] = 'Activity registered successfully.';
         }
 
         if (in_array($pivotData->status, [ActivityStatus::COMPLETED->value, ActivityStatus::NOT_COMPLETED->value])) {
@@ -101,8 +147,10 @@ class ActivityService implements ActivityServiceInterface
                 'status' => $newStatus,
             ]);
 
-            return ['message' => 'Activity finished successfully.'];
+            $msg['message'] = 'Activity finished successfully.';
         }
+
+        return $msg;
     }
 
     private function determineCompletionStatus(string $startedAt, string $finishedAt, string $activityDuration): string
