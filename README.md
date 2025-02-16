@@ -1,66 +1,177 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pasaporte Cultural UNIR - Backend 🚀
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API backend desarrollada en Laravel 10.10 para la gestión de actividades culturales, usuarios y sistema de autenticación con integración QR.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Características Principales ✨
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Autenticación JWT** con refresh token y recuperación de contraseña
+- **Gestión de actividades culturales** con registro e inscripción mediante QR
+- **Sistema de roles** (admin/usuario normal)
+- **Geolocalización** de países y ciudades
+- **Perfiles de usuario** personalizables
+- **Endpoints administrativos** protegidos
+- Integración con **Simple QR Code**
+- Configuración mediante variables de entorno
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Requisitos Previos 📋
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.1+
+- Composer 2.5+
+- MySQL 8.0+
+- Node.js 18+ (opcional para assets)
+- Extensiones PHP: BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalación ⚙️
 
-## Laravel Sponsors
+1. Clonar repositorio:
+```bash
+git clone https://github.com/tu-usuario/pasaporte-cultural-backend.git
+cd pasaporte-cultural-backend
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. Instalar dependencias:
+```bash
+composer install
+```
 
-### Premium Partners
+3. Configurar variables de entorno:
+```bash
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+4. Configurar en .env:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=pasaporte_cultural_backend
+DB_USERNAME=root
+DB_PASSWORD=root
 
-## Contributing
+JWT_SECRET=thisismysecretkey
+QR_SECRET=thisismysecretkey
+```
+5. Ejecutar migraciones:
+```bash
+php artisan migrate --seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+6. Ejecutar seeders:
+```bash
+php artisan db:seed
+```
 
-## Code of Conduct
+7. Ejecutar servidor de desarrollo:
+```bash
+php artisan serve
+```
+## Endpoints API 🔌
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Autenticación 🔐
+| Método | Endpoint | Descripción | Middleware |
+|--------|----------|-------------|------------|
+| POST   | `/api/auth/login` | Login de usuario | - |
+| POST   | `/api/auth/register` | Registro de usuario | `validate.domain`, `validate.role` |
+| POST   | `/api/auth/forgot-password` | Recuperación de contraseña | - |
+| POST   | `/api/auth/reset-password` | Resetear contraseña | - |
+| POST   | `/api/auth/refresh-token` | Refrescar token JWT | - |
+| POST   | `/api/auth/validate-token` | Validar token JWT | - |
 
-## Security Vulnerabilities
+### Actividades Culturales 🎭
+| Método | Endpoint | Descripción | Middleware |
+|--------|----------|-------------|------------|
+| GET    | `/api/activities` | Listar todas las actividades | `jwt` |
+| GET    | `/api/activities/{id}` | Obtener detalles de una actividad | `jwt` |
+| GET    | `/api/activities/enrolled` | Actividades en las que el usuario está inscrito | `jwt` |
+| POST   | `/api/activities/register` | Registrar participación en actividad | `jwt`, `validate.qr` |
+| POST   | `/api/activities` | Crear nueva actividad (admin) | `jwt`, `admin.user` |
+| GET    | `/api/activities/autocomplete` | Búsqueda autocompletada (admin) | `jwt`, `admin.user` |
+| GET    | `/api/activities/user` | Actividades por usuario (admin) | `jwt`, `admin.user` |
+| GET    | `/api/activities/attendance` | Reporte de asistencia (admin) | `jwt`, `admin.user` |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Usuarios 👤
+| Método | Endpoint | Descripción | Middleware |
+|--------|----------|-------------|------------|
+| GET    | `/api/users/profile` | Perfil de usuario | `jwt` |
+| PUT    | `/api/users/profile` | Actualizar perfil | `jwt`, `validate.domain` |
+| GET    | `/api/users` | Listar todos usuarios (admin) | `jwt`, `admin.user` |
+| PUT    | `/api/users/{id}` | Actualizar rol de usuario (admin) | `jwt`, `admin.user` |
+| DELETE | `/api/users/{id}` | Eliminar usuario (admin) | `jwt`, `admin.user` |
 
-## License
+### QR Codes 📲
+| Método | Endpoint | Descripción | Middleware |
+|--------|----------|-------------|------------|
+| POST   | `/api/qr-code/regenerate` | Regenerar código QR | `jwt`, `admin.user` |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Localizaciones 🌍
+| Método | Endpoint | Descripción | Middleware |
+|--------|----------|-------------|------------|
+| GET    | `/api/countries` | Listar países | `jwt` |
+| GET    | `/api/countries/{id}/cities` | Ciudades por país | `jwt` |
+
+---
+
+## Variables de Entorno Clave 🔑
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `APP_NAME` | Nombre de la aplicación | `"Pasaporte Cultural UNIR"` |
+| `APP_ENV` | Entorno de la aplicación | `local`, `production` |
+| `APP_KEY` | Clave de cifrado de Laravel | Generada con `php artisan key:generate` |
+| `APP_DEBUG` | Modo depuración | `true` (desarrollo), `false` (producción) |
+| `APP_URL` | URL base de la aplicación | `http://localhost` |
+| `DB_CONNECTION` | Tipo de conexión a la base de datos | `mysql` |
+| `DB_HOST` | Host de la base de datos | `127.0.0.1` |
+| `DB_PORT` | Puerto de la base de datos | `3306` |
+| `DB_DATABASE` | Nombre de la base de datos | `pasaporte_cultural_backend` |
+| `DB_USERNAME` | Usuario de la base de datos | `root` |
+| `DB_PASSWORD` | Contraseña de la base de datos | `root` |
+| `JWT_SECRET` | Secreto para tokens JWT | `thisismysecretkey` |
+| `JWT_ISS` | Emisor de los tokens JWT | `http://localhost` |
+| `JWT_ALGORITHM` | Algoritmo de cifrado JWT | `HS256` |
+| `QR_SECRET` | Secreto para generación de códigos QR | `thisismysecretkey` |
+| `MAIL_MAILER` | Driver para envío de correos | `smtp` |
+| `MAIL_HOST` | Servidor SMTP | `127.0.0.1` |
+| `MAIL_PORT` | Puerto SMTP | `1025` |
+| `MAIL_FROM_ADDRESS` | Email de notificaciones | `pasaporte-cultural@unir.net` |
+| `MAIL_FROM_NAME` | Nombre del remitente | `"Pasaporte Cultural UNIR"` |
+| `VALID_DOMAINS` | Dominios permitidos para registro | `@unir.net,@comunidadunir.net` |
+---
+
+## Configuración Avanzada ⚙️
+
+### Middlewares 🛡️
+| Middleware | Descripción |
+|------------|-------------|
+| `jwt` | Verifica que el token JWT sea válido y esté activo. |
+| `admin.user` | Restringe el acceso solo a usuarios con rol de administrador. |
+| `validate.qr` | Valida que el código QR escaneado sea auténtico y esté asociado a una actividad válida. |
+| `validate.domain` | Verifica que el dominio del correo electrónico esté permitido para el registro. |
+| `validate.role` | Asegura que el rol asignado durante el registro sea válido. |
+
+### Comandos de Artisan 🛠️
+```bash
+# Generar clave de aplicación
+php artisan key:generate
+
+# Generar nuevo secreto JWT
+php artisan jwt:secret
+
+# Ejecutar migraciones y seeders
+php artisan migrate --seed
+
+# Limpiar caché de configuración
+php artisan config:cache
+
+# Limpiar caché de rutas
+php artisan route:cache
+
+# Limpiar caché de vistas
+php artisan view:cache
+```
