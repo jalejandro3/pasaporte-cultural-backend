@@ -7,7 +7,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 interface ActivityService
 {
     public function create(array $data): array;
-    public function getActivityAttendance(?string $search): array;
+    public function getActivityAttendance(?int $activityId): array;
     public function getActivityUser(?string $search): array;
     public function getAllActivities(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator;
     public function getAutocompleteSearch(?string $q): array;
