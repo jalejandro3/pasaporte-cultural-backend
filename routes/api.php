@@ -28,6 +28,7 @@ Route::controller(ActivityController::class)->group(function() {
     Route::post('activities/register', 'register')->middleware('validate.qr');
 
     Route::middleware('admin.user')->group(function () {
+        Route::get('activities/autocomplete', 'getAutocompleteSearch');
         Route::post('activities', 'create');
 
         /**

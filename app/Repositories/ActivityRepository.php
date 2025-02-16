@@ -15,5 +15,6 @@ interface ActivityRepository
     public function findById(int $id): ?Activity;
     public function findByFilters(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator;
     public function findBySearchTerm(?string $search): Builder|Model;
+    public function findByQuery(?string $q): Collection;
     public function findEnrolledByUser(int $perPage, int $userId): Paginator;
 }

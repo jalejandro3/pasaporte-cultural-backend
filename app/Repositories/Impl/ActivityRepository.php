@@ -65,6 +65,15 @@ class ActivityRepository implements ActivityRepositoryInterface
         return $query->first();
     }
 
+    public function findByQuery(?string $q): Collection
+    {
+        $query = $this->activity->query();
+
+        return $query->where('title', 'like', "%$q%")
+            ->select('id', 'title')
+            ->get();
+    }
+
     public function findEnrolledByUser(int $perPage, int $userId): Paginator
     {
         $query = $this->activity->query();
