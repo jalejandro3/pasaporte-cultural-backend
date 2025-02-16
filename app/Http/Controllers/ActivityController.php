@@ -42,6 +42,39 @@ class ActivityController extends Controller
         return $this->success($this->activityService->create($request->all()));
     }
 
+    public function getActivityAttendance(Request $request): JsonResponse
+    {
+        $rules = [
+            'activity_id' => 'nullable|integer|exists:activities,id',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->getActivityAttendance($request->get('activity_id')));
+    }
+
+    /**
+     * @throws InputValidationException
+     */
+    public function getActivityUser(Request $request): JsonResponse
+    {
+        $rules = [
+            'search' => 'nullable|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->getActivityUser($request->get('search')));
+    }
+
     /**
      * @throws InputValidationException
      */
@@ -65,6 +98,24 @@ class ActivityController extends Controller
         $sortOrder = $request->input('sort_order', 'asc');
 
         return $this->activityService->getAllActivities($filters, $perPage, $sortBy, $sortOrder);
+    }
+
+    /**
+     * @throws InputValidationException
+     */
+    public function getAutocompleteSearch(Request $request): JsonResponse
+    {
+        $rules = [
+            'q' => 'nullable|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new InputValidationException($validator->getMessageBag()->toJson());
+        }
+
+        return $this->success($this->activityService->getAutocompleteSearch($request->get('q')));
     }
 
     /**
