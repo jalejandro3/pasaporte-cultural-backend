@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\UnauthorizedException;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
@@ -20,14 +21,14 @@ class Jwt
             $token = $request->bearerToken();
 
             if (!$token) {
-                return response()->json(['message' => 'Token not found.'], Response::HTTP_UNAUTHORIZED);
+                throw new UnauthorizedException('Token not found.');
             }
 
             $decoded = jwt_decode_token($token);
 
             $request->auth = $decoded;
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
+            throw new UnauthorizedException($e->getMessage());
         }
 
         return $next($request);

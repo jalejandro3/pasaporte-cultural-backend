@@ -5,6 +5,7 @@ namespace App\Services\Impl;
 use App\Enums\ActivityStatus;
 use App\Enums\UserRoles;
 use App\Exceptions\ApplicationException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Models\Activity;
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
@@ -14,7 +15,6 @@ use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use App\Workflows\ActivityWorkflow;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class ActivityService implements ActivityServiceInterface
 {
@@ -37,6 +37,9 @@ class ActivityService implements ActivityServiceInterface
         });
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function getActivityAttendance(?int $activityId): array
     {
         $activity = $this->activityRepository->findById($activityId);
@@ -53,6 +56,9 @@ class ActivityService implements ActivityServiceInterface
         ];
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function getActivityUser(?string $search): array
     {
         $user = $this->userRepository->findBySearchTerm($search);
@@ -84,6 +90,9 @@ class ActivityService implements ActivityServiceInterface
         return $this->activityRepository->findByQuery($q)->toArray();
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function getEnrolledActivities(int $perPage, string $token): Paginator
     {
         $decoded = jwt_decode_token($token);
