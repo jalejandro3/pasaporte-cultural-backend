@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\UserRoles;
+use App\Exceptions\UnauthorizedException;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
@@ -21,16 +22,16 @@ class AdminUser
             $token = $request->bearerToken();
 
             if (!$token) {
-                return response()->json(['message' => 'Token not found.'], Response::HTTP_UNAUTHORIZED);
+                throw new UnauthorizedException('Token not found.');
             }
 
             $decoded = jwt_decode_token($token);
 
             if (UserRoles::ADMIN->value !== $decoded->data->role) {
-                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+                throw new UnauthorizedException('Unauthorized');
             }
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
+            throw new UnauthorizedException($e->getMessage());
         }
 
         return $next($request);

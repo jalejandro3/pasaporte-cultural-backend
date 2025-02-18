@@ -42,6 +42,9 @@ class ActivityController extends Controller
         return $this->success($this->activityService->create($request->all()));
     }
 
+    /**
+     * @throws InputValidationException
+     */
     public function getActivityAttendance(Request $request): JsonResponse
     {
         $rules = [
