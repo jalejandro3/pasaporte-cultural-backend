@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
-class InputValidationException extends ApplicationException
+use Exception;
+
+class InputValidationException extends Exception
 {
 }
