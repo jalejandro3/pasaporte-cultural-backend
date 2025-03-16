@@ -13,15 +13,17 @@ use App\Services\ActivityService as ActivityServiceInterface;
 use App\Services\QrCodeService as QrCodeServiceInterface;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use App\Workflows\ActivityWorkflow;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
-class ActivityService implements ActivityServiceInterface
+readonly class ActivityService implements ActivityServiceInterface
 {
     public function __construct(
-        private readonly ActivityRepositoryInterface $activityRepository,
-        private readonly QrCodeServiceInterface $qrCodeService,
-        private readonly UserRepositoryInterface $userRepository
+        private ActivityRepositoryInterface $activityRepository,
+        private QrCodeServiceInterface $qrCodeService,
+        private UserRepositoryInterface $userRepository
     )
     {
     }
@@ -164,9 +166,9 @@ class ActivityService implements ActivityServiceInterface
 
     private function determineCompletionStatus(string $startedAt, string $finishedAt, string $activityDuration): string
     {
-        $requiredDuration = $activityDuration * 3600;
-        $actualDuration = strtotime($finishedAt) - strtotime($startedAt);
+        $requiredDuration = CarbonInterval::hours($activityDuration)->totalSeconds;
+        $actualDuration = Carbon::parse($finishedAt)->diffInSeconds(Carbon::parse($startedAt));
 
-        return $actualDuration >= $requiredDuration ? ActivityStatus::COMPLETED->value : ActivityStatus::NOT_COMPLETED->value;
+        return ($actualDuration >= $requiredDuration) ? ActivityStatus::COMPLETED->value : ActivityStatus::NOT_COMPLETED->value;
     }
 }

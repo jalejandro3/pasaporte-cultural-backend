@@ -49,7 +49,7 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $e): JsonResponse
+    public function render($request, Throwable $e): JsonResponse|Response
     {
         if ($error = $this->exceptionExists($e)) {
             return $this->getResponse($e, $error);
