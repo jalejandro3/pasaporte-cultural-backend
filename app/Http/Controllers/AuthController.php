@@ -43,7 +43,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @throws ApplicationException
+     * @throws InputValidationException
      */
     public function refreshToken(Request $request): JsonResponse
     {
@@ -61,7 +61,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @throws ApplicationException
+     * @throws InputValidationException|ApplicationException
      */
     public function register(Request $request): JsonResponse
     {
@@ -106,8 +106,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @throws InputValidationException
-     * @throws ApplicationException
+     * @throws InputValidationException|ApplicationException
      */
     public function resetPassword(Request $request): JsonResponse
     {
@@ -131,8 +130,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @throws InputValidationException
-     * @throws ApplicationException
+     * @throws InputValidationException|ApplicationException
      */
     public function validateToken(Request $request): JsonResponse
     {

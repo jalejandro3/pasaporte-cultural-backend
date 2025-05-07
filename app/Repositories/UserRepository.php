@@ -16,5 +16,5 @@ interface UserRepository
     public function findByEmail(string $email): ?User;
     public function findByIdDocument(string $idDocument): ?User;
     public function findByFilters(array $filters, int $perPage, string $sortBy, string $sortOrder): Paginator;
-    public function findBySearchTerm(?string $search): Builder|Model;
+    public function findBySearchTerm(?string $search): Builder|Model|null;
 }

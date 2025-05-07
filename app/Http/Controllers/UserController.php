@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\InputValidationException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
 use App\Services\UserService as UserServiceInterface;
@@ -11,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class UserController extends Controller
 {
@@ -23,6 +23,9 @@ class UserController extends Controller
     {
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function destroy(int $id): JsonResponse
     {
         if (!$this->userRepository->findById($id)) {

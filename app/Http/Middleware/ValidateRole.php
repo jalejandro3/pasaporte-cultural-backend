@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\UserRoles;
+use App\Exceptions\InputValidationException;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,14 +13,15 @@ class ValidateRole
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param Closure(Request): (Response) $next
+     * @throws InputValidationException
      */
     public function handle(Request $request, Closure $next): Response
     {
         $role = $request->get('role');
 
         if (!$role || !in_array($role, UserRoles::getValues())) {
-            return response()->json(['message' => 'Invalid role.'], Response::HTTP_BAD_REQUEST);
+            throw new InputValidationException('Invalid role.');
         }
 
         return $next($request);

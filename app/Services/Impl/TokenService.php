@@ -32,6 +32,9 @@ class TokenService implements TokenInterface
         return $refreshToken;
     }
 
+    /**
+     * @throws ApplicationException
+     */
     public function refresh(string $refreshToken): array
     {
         $storedRefreshToken = $this->refreshToken->where('token', $refreshToken)->first();

@@ -30,7 +30,7 @@ class AuthService implements AuthServiceInterface
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
-            throw new ApplicationException('Please verify your email.', Response::HTTP_NOT_FOUND);
+            throw new ApplicationException('Please verify your email.');
         }
 
         $token = Str::random(64);
@@ -57,14 +57,14 @@ class AuthService implements AuthServiceInterface
             Log::error("Failed to send password reset link to $email");
             Log::error($e->getMessage());
 
-            return ['message' => 'Failed to send password reset link.'];
+            throw new ApplicationException('Failed to send password reset link.');
         }
     }
 
     public function login(string $email, string $password): array
     {
         if (!Auth::attempt(['email' => $email, 'password' => $password])) {
-            throw new ApplicationException('Wrong email or password, please verify your data.', Response::HTTP_BAD_REQUEST);
+            throw new ApplicationException('Wrong email or password, please verify your data.');
         }
 
         $user = $this->userRepository->findByEmail($email);
@@ -102,7 +102,7 @@ class AuthService implements AuthServiceInterface
         $user = $this->userRepository->findByEmail($storedToken->email);
 
         if (!$user) {
-            throw new ApplicationException('User not found.', Response::HTTP_BAD_REQUEST);
+            throw new ApplicationException('User not found.');
         }
 
         $user->password = Hash::make($newPassword);
@@ -139,7 +139,7 @@ class AuthService implements AuthServiceInterface
     private function expiredToken(PasswordResetToken $token): void
     {
         if (Carbon::parse($token->created_at)->addHour()->isPast()) {
-            throw new ApplicationException('Token expired.', Response::HTTP_BAD_REQUEST);
+            throw new ApplicationException('Token expired.');
         }
     }
 

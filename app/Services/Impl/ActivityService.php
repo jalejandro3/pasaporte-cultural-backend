@@ -5,6 +5,7 @@ namespace App\Services\Impl;
 use App\Enums\ActivityStatus;
 use App\Enums\UserRoles;
 use App\Exceptions\ApplicationException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Models\Activity;
 use App\Models\User;
 use App\Repositories\UserRepository as UserRepositoryInterface;
@@ -12,16 +13,17 @@ use App\Services\ActivityService as ActivityServiceInterface;
 use App\Services\QrCodeService as QrCodeServiceInterface;
 use App\Repositories\ActivityRepository as ActivityRepositoryInterface;
 use App\Workflows\ActivityWorkflow;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
-class ActivityService implements ActivityServiceInterface
+readonly class ActivityService implements ActivityServiceInterface
 {
     public function __construct(
-        private readonly ActivityRepositoryInterface $activityRepository,
-        private readonly QrCodeServiceInterface $qrCodeService,
-        private readonly UserRepositoryInterface $userRepository
+        private ActivityRepositoryInterface $activityRepository,
+        private QrCodeServiceInterface $qrCodeService,
+        private UserRepositoryInterface $userRepository
     )
     {
     }
@@ -37,6 +39,9 @@ class ActivityService implements ActivityServiceInterface
         });
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function getActivityAttendance(?int $activityId): array
     {
         $activity = $this->activityRepository->findById($activityId);
@@ -53,6 +58,9 @@ class ActivityService implements ActivityServiceInterface
         ];
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function getActivityUser(?string $search): array
     {
         $user = $this->userRepository->findBySearchTerm($search);
@@ -84,6 +92,9 @@ class ActivityService implements ActivityServiceInterface
         return $this->activityRepository->findByQuery($q)->toArray();
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     */
     public function getEnrolledActivities(int $perPage, string $token): Paginator
     {
         $decoded = jwt_decode_token($token);
@@ -126,28 +137,28 @@ class ActivityService implements ActivityServiceInterface
         if (!$pivotData) {
             $user->activities()->attach($activityId, ['started_at' => now()]);
 
-            $msg['message'] = 'Activity registered successfully.';
-        }
+            $msg['message'] = 'Actividad registrada exitosamente.';
+        } else {
+            if (in_array($pivotData->status, [ActivityStatus::COMPLETED->value, ActivityStatus::NOT_COMPLETED->value])) {
+                throw new ApplicationException('You cannot scan this activity again. You have already completed it.');
+            }
 
-        if (in_array($pivotData->status, [ActivityStatus::COMPLETED->value, ActivityStatus::NOT_COMPLETED->value])) {
-            throw new ApplicationException('You cannot scan this activity again. You have already completed it.');
-        }
+            if ($pivotData->started_at && !$pivotData->finished_at) {
+                $newStatus = $this->determineCompletionStatus(
+                    $pivotData->started_at,
+                    now()->format('Y-m-d H:i:s'),
+                    $activity->duration
+                );
 
-        if ($pivotData->started_at && !$pivotData->finished_at) {
-            $newStatus = $this->determineCompletionStatus(
-                $pivotData->started_at,
-                now()->format('Y-m-d H:i:s'),
-                $activity->duration
-            );
+                ActivityWorkflow::ensureTransitionIsValid(ActivityStatus::IN_PROGRESS->value, $newStatus);
 
-            ActivityWorkflow::ensureTransitionIsValid(ActivityStatus::IN_PROGRESS->value, $newStatus);
+                $user->activities()->updateExistingPivot($activityId, [
+                    'finished_at' => now(),
+                    'status' => $newStatus,
+                ]);
 
-            $user->activities()->updateExistingPivot($activityId, [
-                'finished_at' => now(),
-                'status' => $newStatus,
-            ]);
-
-            $msg['message'] = 'Activity finished successfully.';
+                $msg['message'] = 'Actividad finalizada exitosamente.';
+            }
         }
 
         return $msg;
@@ -155,9 +166,9 @@ class ActivityService implements ActivityServiceInterface
 
     private function determineCompletionStatus(string $startedAt, string $finishedAt, string $activityDuration): string
     {
-        $requiredDuration = $activityDuration * 3600;
-        $actualDuration = strtotime($finishedAt) - strtotime($startedAt);
+        $requiredDuration = CarbonInterval::hours($activityDuration)->totalSeconds;
+        $actualDuration = Carbon::parse($finishedAt)->diffInSeconds(Carbon::parse($startedAt));
 
-        return $actualDuration >= $requiredDuration ? ActivityStatus::COMPLETED->value : ActivityStatus::NOT_COMPLETED->value;
+        return ($actualDuration >= $requiredDuration) ? ActivityStatus::COMPLETED->value : ActivityStatus::NOT_COMPLETED->value;
     }
 }
