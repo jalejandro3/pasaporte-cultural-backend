@@ -66,7 +66,7 @@ class UserRepository implements UserRepositoryInterface
         return $query->paginate($perPage);
     }
 
-    public function findBySearchTerm(?string $search): Builder|Model
+    public function findBySearchTerm(?string $search): Builder|Model|null
     {
         $query = $this->user->query();
 

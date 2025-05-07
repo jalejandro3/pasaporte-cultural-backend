@@ -7,7 +7,7 @@ use InvalidArgumentException;
 
 class ActivityWorkflow
 {
-    private const TRANSITIONS = [
+    private const array TRANSITIONS = [
         ActivityStatus::IN_PROGRESS->value => [
             ActivityStatus::COMPLETED->value,
             ActivityStatus::NOT_COMPLETED->value
