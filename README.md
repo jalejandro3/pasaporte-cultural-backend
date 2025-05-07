@@ -19,7 +19,7 @@ API backend desarrollada en Laravel 10.10 para la gestión de actividades cultur
 
 ## Requisitos Previos 📋
 
-- PHP 8.1+
+- PHP 8.4
 - Composer 2.5+
 - MySQL 8.0+
 - Node.js 18+ (opcional para assets)
