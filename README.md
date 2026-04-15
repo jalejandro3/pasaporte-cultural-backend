@@ -1,177 +1,132 @@
-# Pasaporte Cultural UNIR - Backend 🚀
+# Pasaporte Cultural UNIR — Backend
 
-API backend desarrollada en Laravel 10.10 para la gestión de actividades culturales, usuarios y sistema de autenticación con integración QR.
+REST API backend for the Pasaporte Cultural platform, developed as the final project for the MSc in Software Engineering at Universidad Internacional de La Rioja (UNIR), Spain.
 
----
-
-## Características Principales ✨
-
-- **Autenticación JWT** con refresh token y recuperación de contraseña
-- **Gestión de actividades culturales** con registro e inscripción mediante QR
-- **Sistema de roles** (admin/usuario normal)
-- **Geolocalización** de países y ciudades
-- **Perfiles de usuario** personalizables
-- **Endpoints administrativos** protegidos
-- Integración con **Simple QR Code**
-- Configuración mediante variables de entorno
+The platform allows university students to browse cultural activities, register attendance via QR code scanning, and track completion status toward academic credit. Administrators manage activities, users, and participation reports.
 
 ---
 
-## Requisitos Previos 📋
+## Architecture
 
-- PHP 8.4
-- Composer 2.5+
-- MySQL 8.0+
-- Node.js 18+ (opcional para assets)
-- Extensiones PHP: BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML
+The original version follows a **layered architecture** — a deliberate decision based on the scope and complexity of the domain. With a well-defined but relatively contained business model, a layered approach provided clear separation between presentation, application, and data layers without the overhead of a more complex architectural style.
+
+The backend is fully decoupled from the frontend, exposing a REST API consumed by a React application.
+
+**Currently being refactored** to apply **Hexagonal Architecture** and **TDD** practices:
+- Domain logic is being extracted into a pure PHP layer with no framework dependencies
+- Repository interfaces are defined in the domain and implemented in infrastructure using Eloquent
+- All domain behavior is covered by unit tests running without framework bootstrap
+
+This refactor is a deliberate exercise — revisiting past architectural decisions with new knowledge and improving them with justification.
 
 ---
 
-## Instalación ⚙️
+## Tech Stack
 
-1. Clonar repositorio:
+- PHP 8.4 / Laravel 10
+- MySQL 8.0
+- JWT Authentication (with refresh token)
+- Simple QR Code for activity validation
+- REST API consumed by a decoupled React frontend
+
+---
+
+## Key Features
+
+- **Role-based access control** — attendee and administrator roles with distinct permissions
+- **QR-based attendance flow** — scan to start, scan again to finish; completion determined by time invested vs. required hours
+- **Activity management** — administrators create and manage activities with regenerable QR codes
+- **Participation tracking** — status per user: in progress, completed, not completed
+- **Admin reporting** — query participation by user or by activity
+- **Domain validation** — email registration restricted to allowed institutional domains
+
+---
+
+## API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | User login |
+| POST | `/api/auth/register` | User registration |
+| POST | `/api/auth/forgot-password` | Password recovery |
+| POST | `/api/auth/reset-password` | Password reset |
+| POST | `/api/auth/refresh-token` | Refresh JWT token |
+| POST | `/api/auth/validate-token` | Validate JWT token |
+
+### Cultural Activities
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/activities` | List all activities |
+| GET | `/api/activities/{id}` | Get activity details |
+| GET | `/api/activities/enrolled` | Activities the user is enrolled in |
+| POST | `/api/activities/register` | Register participation via QR |
+| POST | `/api/activities` | Create activity (admin) |
+| GET | `/api/activities/autocomplete` | Autocomplete search (admin) |
+| GET | `/api/activities/user` | Activities by user (admin) |
+| GET | `/api/activities/attendance` | Attendance report (admin) |
+
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/users/profile` | Get user profile |
+| PUT | `/api/users/profile` | Update profile |
+| GET | `/api/users` | List all users (admin) |
+| PUT | `/api/users/{id}` | Update user role (admin) |
+| DELETE | `/api/users/{id}` | Delete user (admin) |
+
+### QR Codes
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/qr-code/regenerate` | Regenerate QR code (admin) |
+
+### Locations
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/countries` | List countries |
+| GET | `/api/countries/{id}/cities` | Cities by country |
+
+---
+
+## Local Setup
+
+**Requirements:** PHP 8.4, Composer 2.5+, MySQL 8.0+
+
 ```bash
-git clone https://github.com/tu-usuario/pasaporte-cultural-backend.git
+git clone https://github.com/jalejandro3/pasaporte-cultural-backend.git
 cd pasaporte-cultural-backend
-```
-
-2. Instalar dependencias:
-```bash
 composer install
-```
-
-3. Configurar variables de entorno:
-```bash
 cp .env.example .env
-```
-
-4. Configurar en .env:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=pasaporte_cultural_backend
-DB_USERNAME=root
-DB_PASSWORD=root
-
-JWT_SECRET=thisismysecretkey
-QR_SECRET=thisismysecretkey
-```
-5. Ejecutar migraciones:
-```bash
+php artisan key:generate
+php artisan jwt:secret
 php artisan migrate --seed
-```
-
-6. Ejecutar seeders:
-```bash
-php artisan db:seed
-```
-
-7. Ejecutar servidor de desarrollo:
-```bash
 php artisan serve
 ```
-## Endpoints API 🔌
 
-### Autenticación 🔐
-| Método | Endpoint | Descripción | Middleware |
-|--------|----------|-------------|------------|
-| POST   | `/api/auth/login` | Login de usuario | - |
-| POST   | `/api/auth/register` | Registro de usuario | `validate.domain`, `validate.role` |
-| POST   | `/api/auth/forgot-password` | Recuperación de contraseña | - |
-| POST   | `/api/auth/reset-password` | Resetear contraseña | - |
-| POST   | `/api/auth/refresh-token` | Refrescar token JWT | - |
-| POST   | `/api/auth/validate-token` | Validar token JWT | - |
-
-### Actividades Culturales 🎭
-| Método | Endpoint | Descripción | Middleware |
-|--------|----------|-------------|------------|
-| GET    | `/api/activities` | Listar todas las actividades | `jwt` |
-| GET    | `/api/activities/{id}` | Obtener detalles de una actividad | `jwt` |
-| GET    | `/api/activities/enrolled` | Actividades en las que el usuario está inscrito | `jwt` |
-| POST   | `/api/activities/register` | Registrar participación en actividad | `jwt`, `validate.qr` |
-| POST   | `/api/activities` | Crear nueva actividad (admin) | `jwt`, `admin.user` |
-| GET    | `/api/activities/autocomplete` | Búsqueda autocompletada (admin) | `jwt`, `admin.user` |
-| GET    | `/api/activities/user` | Actividades por usuario (admin) | `jwt`, `admin.user` |
-| GET    | `/api/activities/attendance` | Reporte de asistencia (admin) | `jwt`, `admin.user` |
-
-### Usuarios 👤
-| Método | Endpoint | Descripción | Middleware |
-|--------|----------|-------------|------------|
-| GET    | `/api/users/profile` | Perfil de usuario | `jwt` |
-| PUT    | `/api/users/profile` | Actualizar perfil | `jwt`, `validate.domain` |
-| GET    | `/api/users` | Listar todos usuarios (admin) | `jwt`, `admin.user` |
-| PUT    | `/api/users/{id}` | Actualizar rol de usuario (admin) | `jwt`, `admin.user` |
-| DELETE | `/api/users/{id}` | Eliminar usuario (admin) | `jwt`, `admin.user` |
-
-### QR Codes 📲
-| Método | Endpoint | Descripción | Middleware |
-|--------|----------|-------------|------------|
-| POST   | `/api/qr-code/regenerate` | Regenerar código QR | `jwt`, `admin.user` |
-
-### Localizaciones 🌍
-| Método | Endpoint | Descripción | Middleware |
-|--------|----------|-------------|------------|
-| GET    | `/api/countries` | Listar países | `jwt` |
-| GET    | `/api/countries/{id}/cities` | Ciudades por país | `jwt` |
-
----
-
-## Variables de Entorno Clave 🔑
-
-| Variable | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `APP_NAME` | Nombre de la aplicación | `"Pasaporte Cultural UNIR"` |
-| `APP_ENV` | Entorno de la aplicación | `local`, `production` |
-| `APP_KEY` | Clave de cifrado de Laravel | Generada con `php artisan key:generate` |
-| `APP_DEBUG` | Modo depuración | `true` (desarrollo), `false` (producción) |
-| `APP_URL` | URL base de la aplicación | `http://localhost` |
-| `DB_CONNECTION` | Tipo de conexión a la base de datos | `mysql` |
-| `DB_HOST` | Host de la base de datos | `127.0.0.1` |
-| `DB_PORT` | Puerto de la base de datos | `3306` |
-| `DB_DATABASE` | Nombre de la base de datos | `pasaporte_cultural_backend` |
-| `DB_USERNAME` | Usuario de la base de datos | `root` |
-| `DB_PASSWORD` | Contraseña de la base de datos | `root` |
-| `JWT_SECRET` | Secreto para tokens JWT | `thisismysecretkey` |
-| `JWT_ISS` | Emisor de los tokens JWT | `http://localhost` |
-| `JWT_ALGORITHM` | Algoritmo de cifrado JWT | `HS256` |
-| `QR_SECRET` | Secreto para generación de códigos QR | `thisismysecretkey` |
-| `MAIL_MAILER` | Driver para envío de correos | `smtp` |
-| `MAIL_HOST` | Servidor SMTP | `127.0.0.1` |
-| `MAIL_PORT` | Puerto SMTP | `1025` |
-| `MAIL_FROM_ADDRESS` | Email de notificaciones | `pasaporte-cultural@unir.net` |
-| `MAIL_FROM_NAME` | Nombre del remitente | `"Pasaporte Cultural UNIR"` |
-| `VALID_DOMAINS` | Dominios permitidos para registro | `@unir.net,@comunidadunir.net` |
----
-
-## Configuración Avanzada ⚙️
-
-### Middlewares 🛡️
-| Middleware | Descripción |
-|------------|-------------|
-| `jwt` | Verifica que el token JWT sea válido y esté activo. |
-| `admin.user` | Restringe el acceso solo a usuarios con rol de administrador. |
-| `validate.qr` | Valida que el código QR escaneado sea auténtico y esté asociado a una actividad válida. |
-| `validate.domain` | Verifica que el dominio del correo electrónico esté permitido para el registro. |
-| `validate.role` | Asegura que el rol asignado durante el registro sea válido. |
-
-### Comandos de Artisan 🛠️
-```bash
-# Generar clave de aplicación
-php artisan key:generate
-
-# Generar nuevo secreto JWT
-php artisan jwt:secret
-
-# Ejecutar migraciones y seeders
-php artisan migrate --seed
-
-# Limpiar caché de configuración
-php artisan config:cache
-
-# Limpiar caché de rutas
-php artisan route:cache
-
-# Limpiar caché de vistas
-php artisan view:cache
+Key `.env` variables:
+```env
+DB_DATABASE=pasaporte_cultural_backend
+JWT_SECRET=your_jwt_secret
+QR_SECRET=your_qr_secret
+VALID_DOMAINS=@unir.net,@comunidadunir.net
 ```
+
+---
+
+## Learning Branches
+
+This repository also serves as a technical learning journal:
+
+| Branch | Focus |
+|--------|-------|
+| `main` | Original Laravel implementation |
+| `learning/http-fundamentals` | HTTP from scratch — no framework |
+| `learning/php-no-framework` | PHP router and request handling without Laravel |
+| `learning/tdd-hex-arch-ddd` | TDD, Hexagonal Architecture, and DDD applied |
+
+---
+
+## Frontend
+
+The React frontend is maintained in a separate repository:
+[pasaporte-cultural-frontend](https://bitbucket.org/pasaporte-cultural-unir/pasaporte-cultural-frontend)
