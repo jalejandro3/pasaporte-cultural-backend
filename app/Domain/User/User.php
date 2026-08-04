@@ -14,7 +14,7 @@ class User
         private readonly string $idDocument,
         private readonly string $password,
         private readonly string $email,
-        private readonly UserRole $role
+        private UserRole $role
     )
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -37,6 +37,16 @@ class User
     public function getRole(): UserRole
     {
         return $this->role;
+    }
+
+    public function setRole(UserRole $role): void
+    {
+        $this->role = $role;
+    }
+
+    public function isAdmin(): bool
+    {
+        return UserRole::ADMIN === $this->role;
     }
 
     private function generateId(): void
