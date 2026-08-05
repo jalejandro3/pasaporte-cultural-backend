@@ -117,7 +117,7 @@ The core concept of the system. Represents a student's attendance at an activity
 ### User Role Management
 - Only admin users can change a user's role.
 - Assigning a user their current role is a no-op (no change, no error).
-- _(pending)_ An admin cannot be demoted if they are the last remaining admin in the system.
+- An admin cannot be demoted if they are the last remaining admin in the system.
 - _(pending)_ Changing the role of a non-existent user raises an exception.
 
 ## Tech Stack

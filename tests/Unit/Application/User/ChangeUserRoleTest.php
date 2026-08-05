@@ -3,6 +3,7 @@
 namespace Tests\Unit\Application\User;
 
 use App\Application\User\AssignmentRoleException;
+use App\Application\User\CannotDemoteLastAdminException;
 use App\Application\User\ChangeUserRole;
 use App\Domain\User\User;
 use App\Domain\User\UserRepository;
@@ -40,5 +41,21 @@ class ChangeUserRoleTest extends TestCase
         $this->expectExceptionMessage('You do not have permission to change the role of this user.');
 
         $changeUserRole->execute($assistant, $user->getEmail(), UserRole::ADMIN);
+    }
+
+    public function test_change_user_role_admin_user_can_not_demote_last_admin_user()
+    {
+        $user = new User('admin', 'admin', '0000000000', '1234567890', 'admin@example.com', UserRole::ADMIN);
+        $userRepository = $this->createStub(UserRepository::class);
+
+        $userRepository->method('findByEmail')->willReturn($user);
+        $userRepository->method('countAdmins')->willReturn(1);
+
+        $changeUserRole = new ChangeUserRole($userRepository);
+
+        $this->expectException(CannotDemoteLastAdminException::class);
+        $this->expectExceptionMessage('You cannot demote the last admin user.');
+
+        $changeUserRole->execute($user, $user->getEmail(), UserRole::ASSISTANT);
     }
 }
