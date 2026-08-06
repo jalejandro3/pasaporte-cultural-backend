@@ -169,6 +169,8 @@ Order (respecting physical + TDD dependencies):
 - ⬜ `country` / `city` / `address` are plain strings, not value objects
 - ⬜ "Credits" mentioned in domain but no Credit concept exists
 - ⬜ `users` migration desynced from User entity (missing role, id_document, etc.)
+- ⬜ CI pipeline (GitHub Actions): run PHPUnit + PHPStan on push — build status badge (free for public repos)
+- ⬜ Coverage reporting (Codecov): publish coverage badge, track over time — account already created
 
 ## Tech Stack
 
