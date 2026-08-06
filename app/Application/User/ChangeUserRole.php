@@ -27,6 +27,10 @@ readonly class ChangeUserRole
             throw new NonExistentUserException('You cannot change role for non-existent user.');
         }
 
+        if ($role === $user->getRole()) {
+            return;
+        }
+
         if ($role === UserRole::ASSISTANT && $email === $actor->getEmail() && $this->userRepository->countAdmins() === 1) {
             throw new CannotDemoteLastAdminException('You cannot demote the last admin user.');
         }

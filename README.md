@@ -137,6 +137,8 @@ The core concept of the system. Represents a student's attendance at an activity
 - Assigning a user their current role is a no-op (no change, no error).
 - An admin cannot be demoted if they are the last remaining admin in the system.
 - Changing the role of a non-existent user raises an exception.
+- Assigning a user their current role is a no-op (returns early, no change, no error).
+  Intentionally untested: if removed, the only consequence is a redundant UPDATE, not a business failure.
 
 ## Roadmap
 
