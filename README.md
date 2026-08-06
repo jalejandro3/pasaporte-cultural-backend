@@ -120,6 +120,36 @@ The core concept of the system. Represents a student's attendance at an activity
 - An admin cannot be demoted if they are the last remaining admin in the system.
 - Changing the role of a non-existent user raises an exception.
 
+## Roadmap
+
+### Current: Vertical slice — CreateParticipation (end-to-end)
+
+Taking `CreateParticipation` from domain to HTTP as the first complete
+hexagonal slice: executable, demonstrable, and fixing the core cracks it
+touches along the way.
+
+Order (respecting physical + TDD dependencies):
+
+1. ⬜ Domain — fix Participation cracks (exception layer convention first)
+2. ⬜ Port — align `ParticipationRepository` to the fixed domain
+3. ⬜ Migration — `participations` table
+4. ⬜ Eloquent model
+5. ⬜ Feature test (hits real DB — guides the adapter in red)
+6. ⬜ Adapter — `EloquentParticipationRepository` (fix broken signature: UUID is string, not int)
+7. ⬜ Route
+8. ⬜ Controller
+
+**Next action:** start piece 1 — Participation domain exception convention, in TDD cycles.
+
+### Backlog (found in core audit, not blocking the slice)
+
+- ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
+- ⬜ Participation use cases don't validate the actor (unlike ChangeUserRole)
+- ⬜ Exception layer convention inconsistent across aggregates (User vs Participation)
+- ⬜ `country` / `city` / `address` are plain strings, not value objects
+- ⬜ "Credits" mentioned in domain but no Credit concept exists
+- ⬜ `users` migration desynced from User entity (missing role, id_document, etc.)
+
 ## Tech Stack
 
 - **PHP 8.4** with **Laravel**
