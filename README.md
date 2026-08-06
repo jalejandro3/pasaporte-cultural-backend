@@ -20,58 +20,76 @@ Built using **Hexagonal Architecture (Ports & Adapters)** with **Test-Driven Dev
 - **Application** — Use cases that orchestrate domain logic through ports. No business rules live here, only workflow coordination.
 - **Infrastructure** — Adapters (Eloquent repositories, controllers, external services). Depends on Application and Domain.
 
-### Project Structure
+## Project Structure
 
 ```
 app/
 ├── Application/
 │   ├── Activity/
-│   │   ├── ShowActivity.php
-│   │   └── ActivityDTO.php
+│   │   ├── ActivityDTO.php
+│   │   └── ShowActivity.php
 │   ├── Participation/
 │   │   ├── CreateParticipation.php
 │   │   └── FinishParticipation.php
 │   └── User/
+│       ├── AssignmentRoleException.php
+│       ├── CannotDemoteLastAdminException.php
+│       ├── ChangeUserRole.php
 │       ├── CreateAssistant.php
-│       ├── UserDTO.php
 │       ├── InvalidEmailDomainException.php
+│       ├── NonExistentUserException.php
+│       ├── UserDTO.php
 │       └── UserExistsException.php
 ├── Domain/
 │   ├── Activity/
 │   │   ├── Activity.php
 │   │   └── ActivityRepository.php
 │   ├── Participation/
-│   │   ├── Participation.php
-│   │   ├── ParticipationStatus.php
-│   │   ├── ParticipationRepository.php
 │   │   ├── FinishedParticipationException.php
 │   │   ├── NotFoundParticipationException.php
+│   │   ├── Participation.php
 │   │   ├── ParticipationExistsException.php
+│   │   ├── ParticipationRepository.php
+│   │   ├── ParticipationStatus.php
 │   │   ├── ParticipationVerificationCodeMismatchException.php
 │   │   └── PriorEndDateParticipationException.php
 │   └── User/
+│       ├── InvalidEmailFormatException.php
 │       ├── User.php
-│       ├── UserRole.php
 │       ├── UserRepository.php
-│       └── InvalidEmailFormatException.php
+│       └── UserRole.php
+├── Infrastructure/
+│   └── Participation/
+│       └── EloquentParticipationRepository.php
+├── Http/
+│   └── Controllers/
+│       └── Controller.php
+├── Models/
+│   └── User.php
+└── Providers/
+    └── AppServiceProvider.php
+
 tests/
+├── Unit/
+│   ├── Application/
+│   │   ├── Activity/
+│   │   │   └── ShowActivityTest.php
+│   │   ├── Participation/
+│   │   │   ├── CreateParticipationTest.php
+│   │   │   └── FinishParticipationTest.php
+│   │   └── User/
+│   │       ├── ChangeUserRoleTest.php
+│   │       └── CreateAssistantTest.php
+│   └── Domain/
+│       ├── ActivityTest.php
+│       ├── ParticipationTest.php
+│       └── UserTest.php
+├── Feature/          # empty — first feature test lands with the CreateParticipation slice
 ├── ObjectMother/
 │   ├── ActivityMother.php
 │   ├── AdminMother.php
 │   └── AssistantMother.php
-└── Unit/
-    ├── Application/
-    │   ├── Activity/
-    │   │   └── ShowActivityTest.php
-    │   ├── Participation/
-    │   │   ├── CreateParticipationTest.php
-    │   │   └── FinishParticipationTest.php
-    │   └── User/
-    │       └── CreateAssistantTest.php
-    └── Domain/
-        ├── ActivityTest.php
-        ├── ParticipationTest.php
-        └── UserTest.php
+└── TestCase.php
 ```
 
 ### Domain Organization
