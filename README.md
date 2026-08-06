@@ -30,7 +30,10 @@ app/
 │   │   └── ShowActivity.php
 │   ├── Participation/
 │   │   ├── CreateParticipation.php
-│   │   └── FinishParticipation.php
+│   │   ├── FinishParticipation.php
+│   │   ├── NotFoundParticipationException.php
+│   │   ├── ParticipationExistsException.php
+│   │   └── ParticipationVerificationCodeMismatchException.php
 │   └── User/
 │       ├── AssignmentRoleException.php
 │       ├── CannotDemoteLastAdminException.php
@@ -46,12 +49,9 @@ app/
 │   │   └── ActivityRepository.php
 │   ├── Participation/
 │   │   ├── FinishedParticipationException.php
-│   │   ├── NotFoundParticipationException.php
 │   │   ├── Participation.php
-│   │   ├── ParticipationExistsException.php
 │   │   ├── ParticipationRepository.php
 │   │   ├── ParticipationStatus.php
-│   │   ├── ParticipationVerificationCodeMismatchException.php
 │   │   └── PriorEndDateParticipationException.php
 │   └── User/
 │       ├── InvalidEmailFormatException.php
@@ -148,7 +148,7 @@ touches along the way.
 
 Order (respecting physical + TDD dependencies):
 
-1. ⬜ Domain — fix Participation cracks (exception layer convention first)
+1. ✅ Domain — fix Participation cracks (exception layer convention)
 2. ⬜ Port — align `ParticipationRepository` to the fixed domain
 3. ⬜ Migration — `participations` table
 4. ⬜ Eloquent model
