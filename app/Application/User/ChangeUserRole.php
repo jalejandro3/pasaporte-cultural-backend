@@ -13,18 +13,23 @@ readonly class ChangeUserRole
     /**
      * @throws AssignmentRoleException
      * @throws CannotDemoteLastAdminException
+     * @throws NonExistentUserException
      */
-    public function execute(User $admin, string $email, UserRole $role): void
+    public function execute(User $actor, string $email, UserRole $role): void
     {
-        if (!$admin->isAdmin()) {
+        if (!$actor->isAdmin()) {
             throw new AssignmentRoleException('You do not have permission to change the role of this user.');
         }
 
-        if ($role === UserRole::ASSISTANT && $email === $admin->getEmail() && $this->userRepository->countAdmins() === 1) {
-            throw new CannotDemoteLastAdminException('You cannot demote the last admin user.');
+        $user = $this->userRepository->findByEmail($email);
+
+        if (!$user) {
+            throw new NonExistentUserException('You cannot change role for non-existent user.');
         }
 
-        $user = $this->userRepository->findByEmail($email);
+        if ($role === UserRole::ASSISTANT && $email === $actor->getEmail() && $this->userRepository->countAdmins() === 1) {
+            throw new CannotDemoteLastAdminException('You cannot demote the last admin user.');
+        }
 
         $user->setRole($role);
         $this->userRepository->save($user);
