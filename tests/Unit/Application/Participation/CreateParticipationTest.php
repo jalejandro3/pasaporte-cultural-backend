@@ -4,10 +4,10 @@ namespace Tests\Unit\Application\Participation;
 
 use App\Application\Participation\CreateParticipation;
 use App\Application\Participation\ParticipationExistsException;
+use App\Application\Participation\ParticipationVerificationCodeMismatchException;
 use App\Domain\Participation\Participation;
 use App\Domain\Participation\ParticipationRepository;
 use App\Domain\Participation\ParticipationStatus;
-use App\Domain\Participation\ParticipationVerificationCodeMismatchException;
 use PHPUnit\Framework\TestCase;
 use Tests\ObjectMother\ActivityMother;
 use Tests\ObjectMother\AssistantMother;

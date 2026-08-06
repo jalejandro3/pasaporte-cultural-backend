@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Participation;
+namespace App\Application\Participation;
 
 class ParticipationVerificationCodeMismatchException extends \Exception
 {
