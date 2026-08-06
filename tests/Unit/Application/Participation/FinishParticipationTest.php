@@ -3,7 +3,7 @@
 namespace Tests\Unit\Application\Participation;
 
 use App\Application\Participation\FinishParticipation;
-use App\Domain\Participation\NotFoundParticipationException;
+use App\Application\Participation\NotFoundParticipationException;
 use App\Domain\Participation\Participation;
 use App\Domain\Participation\ParticipationRepository;
 use App\Domain\Participation\ParticipationStatus;

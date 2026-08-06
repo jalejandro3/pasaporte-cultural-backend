@@ -4,7 +4,6 @@ namespace App\Application\Participation;
 
 use App\Domain\Activity\Activity;
 use App\Domain\Participation\FinishedParticipationException;
-use App\Domain\Participation\NotFoundParticipationException;
 use App\Domain\Participation\Participation;
 use App\Domain\Participation\ParticipationRepository;
 use App\Domain\Participation\ParticipationVerificationCodeMismatchException;
