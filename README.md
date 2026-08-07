@@ -2,10 +2,6 @@
 
 Backend application for the Pasaporte Cultural system at Universidad Internacional de La Rioja (UNIR). This system verifies and records student participation in cultural activities to grant university credits.
 
-## About This Branch
-
-This branch (`refactor-tdd-paa`) is a complete rewrite of the original codebase found in the `main` branch. The original implementation followed a traditional layered approach (use cases, service layer, thin controllers, repositories). This rewrite rebuilds the application from scratch using TDD and Hexagonal Architecture, with the goal of learning and applying these practices deliberately.
-
 ## Purpose
 
 UNIR offers cultural activities (reading clubs, cinema forums, theater workshops, concerts) that allow students to earn up to six recognized credits throughout their university career. This system serves as the verification and registration mechanism: it confirms that a student actually attended an activity, invested the required time, and therefore qualifies for credits.
