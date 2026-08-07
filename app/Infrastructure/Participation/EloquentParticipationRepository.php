@@ -7,7 +7,7 @@ use App\Domain\Participation\ParticipationRepository;
 
 class EloquentParticipationRepository implements ParticipationRepository
 {
-    public function findByActivityIdAndAssistantId(int $activityId, int $assistantId): ?Participation
+    public function findByActivityIdAndAssistantId(int $activityId, string $assistantId): ?Participation
     {
     }
 
