@@ -147,8 +147,8 @@ touches along the way.
 Order (respecting physical + TDD dependencies):
 
 1. ✅ Domain — fix Participation cracks (exception layer convention)
-2. ⬜ Port — align `ParticipationRepository` to the fixed domain
-3. ⬜ Migration — `participations` table
+2. ✅ Port — align `ParticipationRepository` to the fixed domain
+3. ✅ Migration — `participations` table
 4. ⬜ Eloquent model
 5. ⬜ Feature test (hits real DB — guides the adapter in red)
 6. ⬜ Adapter — `EloquentParticipationRepository` (fix broken signature: UUID is string, not int)
@@ -167,6 +167,9 @@ Order (respecting physical + TDD dependencies):
 - ⬜ `users` migration desynced from User entity (missing role, id_document, etc.)
 - ⬜ CI pipeline (GitHub Actions): run PHPUnit + PHPStan on push — build status badge (free for public repos)
 - ⬜ Coverage reporting (Codecov): publish coverage badge, track over time — account already created
+- ⬜ Add FKs `participations.assistant_id` → `users` and `participations.activity_id` → `activities` (deferred until both target tables exist and are aligned)
+- ⬜ Decide `onDelete` policy for those FKs with credit-history retention in mind (restrict to preserve history vs. cascade)
+- ⬜ `users` migration is desynced from the `User` entity (missing `role`, `id_document`, `first_name`/`last_name`)
 
 ## Tech Stack
 
