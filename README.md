@@ -180,7 +180,7 @@ Order (respecting physical + TDD dependencies):
 php artisan test
 ```
 
-Current test suite: **22 tests, 37 assertions**.
+Current test suite: **26 tests, 45 assertions**.
 
 ## Patterns & Practices
 
