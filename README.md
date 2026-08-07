@@ -1,3 +1,5 @@
+[![CI](https://github.com/jalejandro3/pasaporte-cultural-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/jalejandro3/pasaporte-cultural-backend/actions/workflows/ci.yml)
+
 # Pasaporte Cultural UNIR — Backend
 
 Backend application for the Pasaporte Cultural system at Universidad Internacional de La Rioja (UNIR). This system verifies and records student participation in cultural activities to grant university credits.
@@ -157,19 +159,28 @@ Order (respecting physical + TDD dependencies):
 
 **Next action:** start piece 1 — Participation domain exception convention, in TDD cycles.
 
-### Backlog (found in core audit, not blocking the slice)
+### Backlog
 
+#### Done
+- ✅ CI pipeline (GitHub Actions): run tests on push and PR — build status badge (free for public repos)
+- ✅ Update `actions/checkout` to `@v7` (resolved Node 20 deprecation warning)
+
+#### CI / tooling (pending)
+- ⬜ Install and configure PHPStan + Larastan (own session — choose level, triage findings)
+- ⬜ Add PHPStan step to CI pipeline (after config is clean)
+- ⬜ Add MariaDB service to CI (needed once feature tests hit the DB — slice piece 5)
+- ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
+
+#### Core audit findings (not blocking the slice)
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
 - ⬜ Participation use cases don't validate the actor (unlike ChangeUserRole)
-- ⬜ Exception layer convention inconsistent across aggregates (User vs Participation)
 - ⬜ `country` / `city` / `address` are plain strings, not value objects
 - ⬜ "Credits" mentioned in domain but no Credit concept exists
-- ⬜ `users` migration desynced from User entity (missing role, id_document, etc.)
-- ⬜ CI pipeline (GitHub Actions): run PHPUnit + PHPStan on push — build status badge (free for public repos)
-- ⬜ Coverage reporting (Codecov): publish coverage badge, track over time — account already created
+- ⬜ `users` migration desynced from the `User` entity (missing `role`, `id_document`, `first_name`/`last_name`)
+
+#### Deferred FKs (participations)
 - ⬜ Add FKs `participations.assistant_id` → `users` and `participations.activity_id` → `activities` (deferred until both target tables exist and are aligned)
 - ⬜ Decide `onDelete` policy for those FKs with credit-history retention in mind (restrict to preserve history vs. cascade)
-- ⬜ `users` migration is desynced from the `User` entity (missing `role`, `id_document`, `first_name`/`last_name`)
 
 ## Tech Stack
 
