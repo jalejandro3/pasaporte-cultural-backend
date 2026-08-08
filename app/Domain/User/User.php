@@ -12,7 +12,6 @@ class User
         private readonly string $firstName,
         private readonly string $lastName,
         private readonly string $idDocument,
-        private readonly string $password,
         private readonly string $email,
         private UserRole $role
     )

@@ -13,7 +13,6 @@ class AssistantMother
             'John',
             'Doe',
             '1234567890',
-            'password',
             $email,
             UserRole::ASSISTANT
         );

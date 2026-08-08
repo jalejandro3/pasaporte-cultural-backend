@@ -13,7 +13,6 @@ class AdminMother
             'admin',
             'admin',
             '0000000000',
-            '1234567890',
             'admin@example.com',
             UserRole::ADMIN
         );

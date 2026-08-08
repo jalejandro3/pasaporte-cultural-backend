@@ -24,7 +24,6 @@ class CreateAssistantTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'id_document' => '123456789',
-            'password' => 'password123',
             'email' => 'assistant@unir.net'
         ]);
 
@@ -41,7 +40,6 @@ class CreateAssistantTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'id_document' => '123456789',
-            'password' => 'password123',
             'email' => 'assistant@gmail.com'
         ]);
 
@@ -59,7 +57,6 @@ class CreateAssistantTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'id_document' => '123456789',
-            'password' => 'password',
             'email' => 'assistant@unir.net'
         ];
 
@@ -67,7 +64,6 @@ class CreateAssistantTest extends TestCase
             $assistantData['first_name'],
             $assistantData['last_name'],
             $assistantData['id_document'],
-            $assistantData['password'],
             $assistantData['email'],
             UserRole::ASSISTANT
         );
@@ -92,7 +88,6 @@ class CreateAssistantTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'id_document' => '123456789',
-            'password' => 'password',
             'email' => 'assistant@unir.net',
         ];
 
@@ -100,7 +95,6 @@ class CreateAssistantTest extends TestCase
             $assistantData['first_name'],
             $assistantData['last_name'],
             $assistantData['id_document'],
-            $assistantData['password'],
             $assistantData['email'],
             UserRole::ASSISTANT
         );

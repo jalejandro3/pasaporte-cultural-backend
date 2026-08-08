@@ -34,7 +34,6 @@ readonly class CreateAssistant
             $assistantDTO->firstName,
             $assistantDTO->lastName,
             $assistantDTO->idDocument,
-            $assistantDTO->password,
             $assistantDTO->email,
             UserRole::ASSISTANT
         );

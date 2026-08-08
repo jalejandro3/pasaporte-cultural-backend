@@ -16,7 +16,6 @@ class UserTest extends TestCase
             'John',
             'Doe',
             '1234567890',
-            'password',
             'email',
             UserRole::ASSISTANT
         );

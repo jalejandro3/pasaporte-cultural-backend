@@ -8,7 +8,6 @@ final readonly class UserDTO
         public string $firstName,
         public string $lastName,
         public string $idDocument,
-        public string $password,
         public string $email
     ) {}
 
@@ -18,7 +17,6 @@ final readonly class UserDTO
             $data['first_name'],
             $data['last_name'],
             $data['id_document'],
-            $data['password'],
             $data['email']
         );
     }

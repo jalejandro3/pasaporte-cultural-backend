@@ -17,7 +17,7 @@ class ChangeUserRoleTest extends TestCase
 {
     public function test_change_user_role_admin_user_change_assistant_to_admin_role()
     {
-        $user = new User('John', 'Doe', '1234567890', 'password', 'user@unir.net', UserRole::ASSISTANT);
+        $user = new User('John', 'Doe', '1234567890', 'user@unir.net', UserRole::ASSISTANT);
         $admin = AdminMother::create();
         $userRepository = $this->createMock(UserRepository::class);
 
@@ -33,7 +33,7 @@ class ChangeUserRoleTest extends TestCase
 
     public function test_change_user_role_assistant_user_without_change_role_permission_throws_exception()
     {
-        $user = new User('John', 'Doe', '1234567890', 'password', 'user@unir.net', UserRole::ASSISTANT);
+        $user = new User('John', 'Doe', '1234567890', 'user@unir.net', UserRole::ASSISTANT);
         $assistant = AssistantMother::create();
 
         $changeUserRole = new ChangeUserRole($this->createStub(UserRepository::class));
@@ -46,7 +46,7 @@ class ChangeUserRoleTest extends TestCase
 
     public function test_change_user_role_admin_user_can_not_demote_last_admin_user()
     {
-        $user = new User('admin', 'admin', '0000000000', '1234567890', 'admin@example.com', UserRole::ADMIN);
+        $user = new User('admin', 'admin', '0000000000', 'admin@example.com', UserRole::ADMIN);
         $userRepository = $this->createStub(UserRepository::class);
 
         $userRepository->method('findByEmail')->willReturn($user);
@@ -62,7 +62,7 @@ class ChangeUserRoleTest extends TestCase
 
     public function test_change_user_role_admin_user_can_not_change_role_for_non_existent_user()
     {
-        $user = new User('John', 'Doe', '1234567890', 'password', 'user@unir.net', UserRole::ASSISTANT);
+        $user = new User('John', 'Doe', '1234567890', 'user@unir.net', UserRole::ASSISTANT);
         $admin = AdminMother::create();
         $userRepository = $this->createStub(UserRepository::class);
 

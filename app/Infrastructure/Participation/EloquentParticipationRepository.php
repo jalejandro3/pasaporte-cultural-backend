@@ -9,6 +9,7 @@ class EloquentParticipationRepository implements ParticipationRepository
 {
     public function findByActivityIdAndAssistantId(int $activityId, string $assistantId): ?Participation
     {
+        throw new \RuntimeException('Not implemented yet');
     }
 
     public function save(Participation $participation): void
