@@ -18,6 +18,10 @@ Built using **Hexagonal Architecture (Ports & Adapters)** with **Test-Driven Dev
 - **Application** — Use cases that orchestrate domain logic through ports. No business rules live here, only workflow coordination.
 - **Infrastructure** — Adapters (Eloquent repositories, controllers, external services). Depends on Application and Domain.
 
+## Architecture Decisions
+
+Significant technical decisions are recorded as ADRs (Architecture Decision Records) in [`docs/adr/`](docs/adr/), each capturing the context, the options considered, and the trade-offs accepted.
+
 ## Project Structure
 
 ```
