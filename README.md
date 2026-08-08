@@ -23,70 +23,71 @@ Built using **Hexagonal Architecture (Ports & Adapters)** with **Test-Driven Dev
 ```
 app/
 ├── Application/
-│   ├── Activity/
-│   │   ├── ActivityDTO.php
-│   │   └── ShowActivity.php
-│   ├── Participation/
-│   │   ├── CreateParticipation.php
-│   │   ├── FinishParticipation.php
-│   │   ├── NotFoundParticipationException.php
-│   │   ├── ParticipationExistsException.php
-│   │   └── ParticipationVerificationCodeMismatchException.php
-│   └── User/
-│       ├── AssignmentRoleException.php
-│       ├── CannotDemoteLastAdminException.php
-│       ├── ChangeUserRole.php
-│       ├── CreateAssistant.php
-│       ├── InvalidEmailDomainException.php
-│       ├── NonExistentUserException.php
-│       ├── UserDTO.php
-│       └── UserExistsException.php
+│ ├── Activity/
+│ │ ├── ActivityDTO.php
+│ │ └── ShowActivity.php
+│ ├── Participation/
+│ │ ├── CreateParticipation.php
+│ │ ├── FinishParticipation.php
+│ │ ├── NotFoundParticipationException.php
+│ │ ├── ParticipationExistsException.php
+│ │ └── ParticipationVerificationCodeMismatchException.php
+│ └── User/
+│ ├── AssignmentRoleException.php
+│ ├── CannotDemoteLastAdminException.php
+│ ├── ChangeUserRole.php
+│ ├── CreateAssistant.php
+│ ├── InvalidEmailDomainException.php
+│ ├── NonExistentUserException.php
+│ ├── UserDTO.php
+│ └── UserExistsException.php
 ├── Domain/
-│   ├── Activity/
-│   │   ├── Activity.php
-│   │   └── ActivityRepository.php
-│   ├── Participation/
-│   │   ├── FinishedParticipationException.php
-│   │   ├── Participation.php
-│   │   ├── ParticipationRepository.php
-│   │   ├── ParticipationStatus.php
-│   │   └── PriorEndDateParticipationException.php
-│   └── User/
-│       ├── InvalidEmailFormatException.php
-│       ├── User.php
-│       ├── UserRepository.php
-│       └── UserRole.php
+│ ├── Activity/
+│ │ ├── Activity.php
+│ │ └── ActivityRepository.php
+│ ├── Participation/
+│ │ ├── FinishedParticipationException.php
+│ │ ├── Participation.php
+│ │ ├── ParticipationRepository.php
+│ │ ├── ParticipationStatus.php
+│ │ └── PriorEndDateParticipationException.php
+│ └── User/
+│ ├── InvalidEmailFormatException.php
+│ ├── User.php
+│ ├── UserRepository.php
+│ └── UserRole.php
 ├── Infrastructure/
-│   └── Participation/
-│       └── EloquentParticipationRepository.php
+│ └── Participation/
+│ ├── EloquentParticipation.php
+│ └── EloquentParticipationRepository.php
 ├── Http/
-│   └── Controllers/
-│       └── Controller.php
+│ └── Controllers/
+│ └── Controller.php
 ├── Models/
-│   └── User.php
+│ └── User.php
 └── Providers/
-    └── AppServiceProvider.php
+└── AppServiceProvider.php
 
 tests/
 ├── Unit/
-│   ├── Application/
-│   │   ├── Activity/
-│   │   │   └── ShowActivityTest.php
-│   │   ├── Participation/
-│   │   │   ├── CreateParticipationTest.php
-│   │   │   └── FinishParticipationTest.php
-│   │   └── User/
-│   │       ├── ChangeUserRoleTest.php
-│   │       └── CreateAssistantTest.php
-│   └── Domain/
-│       ├── ActivityTest.php
-│       ├── ParticipationTest.php
-│       └── UserTest.php
-├── Feature/          # empty — first feature test lands with the CreateParticipation slice
+│ ├── Application/
+│ │ ├── Activity/
+│ │ │ └── ShowActivityTest.php
+│ │ ├── Participation/
+│ │ │ ├── CreateParticipationTest.php
+│ │ │ └── FinishParticipationTest.php
+│ │ └── User/
+│ │ ├── ChangeUserRoleTest.php
+│ │ └── CreateAssistantTest.php
+│ └── Domain/
+│ ├── ActivityTest.php
+│ ├── ParticipationTest.php
+│ └── UserTest.php
+├── Feature/ # empty — first feature test lands with the CreateParticipation slice
 ├── ObjectMother/
-│   ├── ActivityMother.php
-│   ├── AdminMother.php
-│   └── AssistantMother.php
+│ ├── ActivityMother.php
+│ ├── AdminMother.php
+│ └── AssistantMother.php
 └── TestCase.php
 ```
 
@@ -132,7 +133,6 @@ The core concept of the system. Represents a student's attendance at an activity
 
 ### User Role Management
 - Only admin users can change a user's role.
-- Assigning a user their current role is a no-op (no change, no error).
 - An admin cannot be demoted if they are the last remaining admin in the system.
 - Changing the role of a non-existent user raises an exception.
 - Assigning a user their current role is a no-op (returns early, no change, no error).
@@ -153,23 +153,29 @@ Order (respecting physical + TDD dependencies):
 3. ✅ Migration — `participations` table
 4. ✅ Eloquent model
 5. ⬜ Feature test (hits real DB — guides the adapter in red)
-6. ⬜ Adapter — `EloquentParticipationRepository` (fix broken signature: UUID is string, not int)
+6. ⬜ Adapter — `EloquentParticipationRepository` (implement stub methods, currently throwing "not implemented")
 7. ⬜ Route
 8. ⬜ Controller
 
-**Next action:** start piece 1 — Participation domain exception convention, in TDD cycles.
+**Next action:** piece 5 — feature test hitting the real DB (own session; needs test DB + MariaDB service in CI).
 
 ### Backlog
 
 #### Done
-- ✅ CI pipeline (GitHub Actions): run tests on push and PR — build status badge (free for public repos)
+- ✅ CI pipeline (GitHub Actions): run tests on push and PR — build status badge
 - ✅ Update `actions/checkout` to `@v7` (resolved Node 20 deprecation warning)
+- ✅ PHPStan + Larastan static analysis (level 5), baselined and running in CI
+- ✅ Remove `password` from `Domain\User\User` (authentication concern, not domain — surfaced by PHPStan)
 
 #### CI / tooling (pending)
-- ⬜ Install and configure PHPStan + Larastan (own session — choose level, triage findings)
-- ⬜ Add PHPStan step to CI pipeline (after config is clean)
 - ⬜ Add MariaDB service to CI (needed once feature tests hit the DB — slice piece 5)
 - ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
+
+#### PHPStan baseline (tracked debt — resolve, don't grow)
+- ⬜ `User::$firstName / $lastName / $idDocument` never read → resolved by ShowProfile use case
+- ⬜ `Participation::$assistant` never read → resolved by a use case that reads the participation's assistant
+- ⬜ `EloquentParticipationRepository` stub methods throw "not implemented" → resolved in slice piece 6 (adapter)
+- ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
 
 #### Core audit findings (not blocking the slice)
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
@@ -186,6 +192,7 @@ Order (respecting physical + TDD dependencies):
 
 - **PHP 8.4** with **Laravel**
 - **PHPUnit 12** for testing
+- **PHPStan 2 + Larastan** for static analysis (level 5)
 - **Ramsey UUID** for domain-generated identifiers
 
 ## Running Tests
@@ -196,10 +203,19 @@ php artisan test
 
 Current test suite: **26 tests, 45 assertions**.
 
+## Static Analysis
+
+```bash
+composer analyse
+```
+
+PHPStan (level 5) with the Larastan extension, run in CI on every push. Pre-existing findings are baselined and tracked in the backlog as pending work — the baseline should only shrink, never grow.
+
 ## Patterns & Practices
 
 - **TDD (Red-Green-Refactor)** — Every feature starts with a failing test.
 - **Hexagonal Architecture** — Domain is isolated from infrastructure.
+- **Static analysis** — PHPStan level 5 with Larastan, enforced in CI.
 - **Domain-specific exceptions** — Each business rule violation has its own exception class.
 - **Object Mother** — Test factories (`ActivityMother`, `AssistantMother`, `AdminMother`) reduce test setup noise.
 - **Immutable DTOs** — Data Transfer Objects with `final readonly` and `fromEntity()` factory methods.
