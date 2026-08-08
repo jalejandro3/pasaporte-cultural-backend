@@ -151,7 +151,7 @@ Order (respecting physical + TDD dependencies):
 1. ✅ Domain — fix Participation cracks (exception layer convention)
 2. ✅ Port — align `ParticipationRepository` to the fixed domain
 3. ✅ Migration — `participations` table
-4. ⬜ Eloquent model
+4. ✅ Eloquent model
 5. ⬜ Feature test (hits real DB — guides the adapter in red)
 6. ⬜ Adapter — `EloquentParticipationRepository` (fix broken signature: UUID is string, not int)
 7. ⬜ Route
