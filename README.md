@@ -156,12 +156,12 @@ Order (respecting physical + TDD dependencies):
 2. ✅ Port — align `ParticipationRepository` to the fixed domain
 3. ✅ Migration — `participations` table
 4. ✅ Eloquent model
-5. ✅ Feature test (hits real DB — guides the adapter in red)
-6. ✅ Adapter — `EloquentParticipationRepository` (implement stub methods, currently throwing "not implemented")
+5. ✅ Feature test — `EloquentParticipationRepository.save` against real DB
+6. ✅ Adapter — `save` implemented + container binding (Domain port → Eloquent adapter)
 7. ⬜ Route
 8. ⬜ Controller
 
-**Next action:** piece 5 — feature test hitting the real DB (own session; needs test DB + MariaDB service in CI).
+**Next action:** piece 7 — define the route for creating a participation.
 
 ### Backlog
 
@@ -170,16 +170,18 @@ Order (respecting physical + TDD dependencies):
 - ✅ Update `actions/checkout` to `@v7` (resolved Node 20 deprecation warning)
 - ✅ PHPStan + Larastan static analysis (level 5), baselined and running in CI
 - ✅ Remove `password` from `Domain\User\User` (authentication concern, not domain — surfaced by PHPStan)
+- ✅ ADR-0001: store participation status in the database
+- ✅ Add MariaDB service to CI (feature tests now run against a real DB in the pipeline)
 
 #### CI / tooling (pending)
-- ⬜ Add MariaDB service to CI (needed once feature tests hit the DB — slice piece 5)
 - ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
 
 #### PHPStan baseline (tracked debt — resolve, don't grow)
 - ⬜ `User::$firstName / $lastName / $idDocument` never read → resolved by ShowProfile use case
-- ⬜ `Participation::$assistant` never read → resolved by a use case that reads the participation's assistant
-- ⬜ `EloquentParticipationRepository` stub methods throw "not implemented" → resolved in slice piece 6 (adapter)
 - ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
+
+#### Wiring not directly tested
+- ⬜ Container binding (`ParticipationRepository` → `EloquentParticipation Repository`) has no dedicated test; covered indirectly by the end-to-end feature test in slice piece 8
 
 #### Core audit findings (not blocking the slice)
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
@@ -205,7 +207,7 @@ Order (respecting physical + TDD dependencies):
 php artisan test
 ```
 
-Current test suite: **26 tests, 45 assertions**.
+Current test suite: **27 tests, 46 assertions**.
 
 ## Static Analysis
 
@@ -219,6 +221,7 @@ PHPStan (level 5) with the Larastan extension, run in CI on every push. Pre-exis
 
 - **TDD (Red-Green-Refactor)** — Every feature starts with a failing test.
 - **Hexagonal Architecture** — Domain is isolated from infrastructure.
+- **Architecture Decision Records** — Significant decisions documented in `docs/adr/`.
 - **Static analysis** — PHPStan level 5 with Larastan, enforced in CI.
 - **Domain-specific exceptions** — Each business rule violation has its own exception class.
 - **Object Mother** — Test factories (`ActivityMother`, `AssistantMother`, `AdminMother`) reduce test setup noise.
