@@ -15,6 +15,26 @@ class Participation
         private readonly \DateTimeImmutable $startTime,
     ) {}
 
+    public function getAssistant(): User
+    {
+        return $this->assistant;
+    }
+
+    public function getActivity(): Activity
+    {
+        return $this->activity;
+    }
+
+    public function getStartTime(): \DateTimeImmutable
+    {
+        return $this->startTime;
+    }
+    
+    public function getEndTime(): \DateTimeImmutable|null
+    {
+        return $this->endTime;
+    }
+
     public function status(): ParticipationStatus
     {
         if ($this->endTime) {

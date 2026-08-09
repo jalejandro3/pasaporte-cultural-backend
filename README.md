@@ -156,8 +156,8 @@ Order (respecting physical + TDD dependencies):
 2. ✅ Port — align `ParticipationRepository` to the fixed domain
 3. ✅ Migration — `participations` table
 4. ✅ Eloquent model
-5. ⬜ Feature test (hits real DB — guides the adapter in red)
-6. ⬜ Adapter — `EloquentParticipationRepository` (implement stub methods, currently throwing "not implemented")
+5. ✅ Feature test (hits real DB — guides the adapter in red)
+6. ✅ Adapter — `EloquentParticipationRepository` (implement stub methods, currently throwing "not implemented")
 7. ⬜ Route
 8. ⬜ Controller
 

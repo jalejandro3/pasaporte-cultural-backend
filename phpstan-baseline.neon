@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Property App\\Domain\\Participation\\Participation\:\:\$assistant is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/Domain/Participation/Participation.php
-
-		-
 			message: '#^Property App\\Domain\\User\\User\:\:\$firstName is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1

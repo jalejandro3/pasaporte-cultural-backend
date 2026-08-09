@@ -14,5 +14,12 @@ class EloquentParticipationRepository implements ParticipationRepository
 
     public function save(Participation $participation): void
     {
+        EloquentParticipation::create([
+            'activity_id' => $participation->getActivity()->getId(),
+            'assistant_id' => $participation->getAssistant()->getId(),
+            'status' => $participation->status()->value,
+            'start_time' => $participation->getStartTime(),
+            'end_time' => $participation->getEndTime(),
+        ]);
     }
 }
