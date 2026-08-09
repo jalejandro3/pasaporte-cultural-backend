@@ -6,10 +6,10 @@ use Ramsey\Uuid\Uuid;
 
 class Activity
 {
+    private string $id;
     private string $verificationCode;
 
     public function __construct(
-        private readonly int $id,
         private readonly string $title,
         private readonly string $description,
         private readonly string $country,
@@ -17,10 +17,11 @@ class Activity
         private readonly string $address,
         private readonly int $totalHours,
     ) {
+        $this->generateId();
         $this->generateVerificationCode();
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -57,6 +58,11 @@ class Activity
     public function getVerificationCode(): string
     {
         return $this->verificationCode;
+    }
+
+    private function generateId(): void
+    {
+        $this->id = Uuid::uuid4()->toString();
     }
 
     public function regenerateVerificationCode(): void

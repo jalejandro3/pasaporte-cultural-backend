@@ -4,5 +4,5 @@ namespace App\Domain\Activity;
 
 interface ActivityRepository
 {
-    public function findById(int $id): ?Activity;
+    public function findById(string $id): ?Activity;
 }

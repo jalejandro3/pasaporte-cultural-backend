@@ -7,7 +7,7 @@ use App\Domain\Activity\Activity;
 final readonly class ActivityDTO
 {
     public function __construct(
-        public int $id,
+        public string $id,
         public string $title,
         public string $description,
         public string $country,

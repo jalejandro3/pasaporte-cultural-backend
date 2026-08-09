@@ -10,7 +10,7 @@ readonly class ShowActivity
 {
     public function __construct(private ActivityRepository $activityRepository) {}
 
-    public function execute(User $user, int $activityId): ActivityDTO
+    public function execute(User $user, string $activityId): ActivityDTO
     {
         $activity = $this->activityRepository->findById($activityId);
         $verificationCode = (UserRole::ADMIN === $user->getRole()) ? $activity->getVerificationCode() : null;

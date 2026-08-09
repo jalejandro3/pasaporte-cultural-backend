@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('participations', function (Blueprint $table) {
             $table->id();
             $table->uuid('assistant_id');
-            $table->unsignedBigInteger('activity_id');
+            $table->uuid('activity_id');
             $table->enum('status', ['IN_PROCESS', 'COMPLETED', 'NOT_COMPLETED']);
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
