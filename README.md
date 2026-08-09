@@ -146,22 +146,34 @@ The core concept of the system. Represents a student's attendance at an activity
 
 ### Current: Vertical slice — CreateParticipation (end-to-end)
 
-Taking `CreateParticipation` from domain to HTTP as the first complete
-hexagonal slice: executable, demonstrable, and fixing the core cracks it
-touches along the way.
+Taking `CreateParticipation` from HTTP to DB. Building the HTTP layer revealed
+that the use case depends on persisting and reconstructing Activity and User
+(not just Participation) — so the slice now includes their persistence.
 
-Order (respecting physical + TDD dependencies):
-
-1. ✅ Domain — fix Participation cracks (exception layer convention)
-2. ✅ Port — align `ParticipationRepository` to the fixed domain
+**Participation persistence**
+1. ✅ Domain — fix Participation cracks
+2. ✅ Port — align `ParticipationRepository`
 3. ✅ Migration — `participations` table
 4. ✅ Eloquent model
-5. ✅ Feature test — `EloquentParticipationRepository.save` against real DB
-6. ✅ Adapter — `save` implemented + container binding (Domain port → Eloquent adapter)
-7. ⬜ Route
-8. ⬜ Controller
+5. ✅ Feature test — `save` against real DB
+6. ✅ Adapter `save` + container binding
+7. ⬜ Adapter `findByActivityIdAndAssistantId` (reconstructs Participation → needs Activity + User repos first)
 
-**Next action:** piece 7 — define the route for creating a participation.
+**Activity persistence** (required by the use case)
+8. ⬜ Migration — `activities` table
+9. ⬜ Eloquent model + adapter (`save`, `findById`)
+10. ⬜ Feature test + container binding
+
+**User persistence** (required by the use case)
+11. ⬜ Eloquent model + adapter (reconcile desynced `users` table with domain entity)
+12. ⬜ Feature test + container binding
+
+**HTTP layer** (once persistence is complete)
+13. ⬜ Route `POST /api/participations`
+14. ⬜ Controller + `CreateParticipationRequest`
+15. ⬜ End-to-end feature test (HTTP → DB)
+
+**Next action:** piece 8 — migration for the `activities` table.
 
 ### Backlog
 
@@ -193,6 +205,9 @@ Order (respecting physical + TDD dependencies):
 #### Deferred FKs (participations)
 - ⬜ Add FKs `participations.assistant_id` → `users` and `participations.activity_id` → `activities` (deferred until both target tables exist and are aligned)
 - ⬜ Decide `onDelete` policy for those FKs with credit-history retention in mind (restrict to preserve history vs. cascade)
+
+#### Auth debt
+- ⬜ `assistant_id` will come from the request body temporarily; once auth exists, it must come from the authenticated user (impersonation risk until then)
 
 ## Tech Stack
 
