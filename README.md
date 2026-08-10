@@ -101,13 +101,15 @@ Code is organized by **business concept**, not by technical type. Everything rel
 
 ## Domain Concepts
 
+All three aggregates (User, Activity, Participation) generate their own UUID identifiers in the domain, independent of the database.
+
 ### User
 
 Represents anyone who interacts with the system. Has a role (`assistant` or `admin`) that determines permissions. Generates its own UUID on creation. Validates email format at construction time.
 
 ### Activity
 
-A cultural event offered by UNIR. Has a title, location (country, city, address), required hours for completion, and a verification code (used for QR generation). The verification code can be regenerated, which invalidates the previous one.
+A cultural event offered by UNIR. Generates its own UUID on creation. Has a title, location (country, city, address), required hours for completion, and a verification code (used for QR generation). The verification code can be regenerated, which invalidates the previous one.
 
 ### Participation
 
@@ -160,7 +162,7 @@ that the use case depends on persisting and reconstructing Activity and User
 7. ⬜ Adapter `findByActivityIdAndAssistantId` (reconstructs Participation → needs Activity + User repos first)
 
 **Activity persistence** (required by the use case)
-8. ⬜ Migration — `activities` table
+8. ⬜ Migration — `activities` table (UUID primary key)
 9. ⬜ Eloquent model + adapter (`save`, `findById`)
 10. ⬜ Feature test + container binding
 
@@ -173,7 +175,7 @@ that the use case depends on persisting and reconstructing Activity and User
 14. ⬜ Controller + `CreateParticipationRequest`
 15. ⬜ End-to-end feature test (HTTP → DB)
 
-**Next action:** piece 8 — migration for the `activities` table.
+**Next action:** piece 8 — migration for the `activities` table (UUID primary key).
 
 ### Backlog
 
@@ -184,6 +186,7 @@ that the use case depends on persisting and reconstructing Activity and User
 - ✅ Remove `password` from `Domain\User\User` (authentication concern, not domain — surfaced by PHPStan)
 - ✅ ADR-0001: store participation status in the database
 - ✅ Add MariaDB service to CI (feature tests now run against a real DB in the pipeline)
+- ✅ Unify Activity identity to UUID (removed int/UUID identifier inconsistency; all aggregates now domain-generated UUIDs)
 
 #### CI / tooling (pending)
 - ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
@@ -193,7 +196,7 @@ that the use case depends on persisting and reconstructing Activity and User
 - ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
 
 #### Wiring not directly tested
-- ⬜ Container binding (`ParticipationRepository` → `EloquentParticipation Repository`) has no dedicated test; covered indirectly by the end-to-end feature test in slice piece 8
+- ⬜ Container binding (`ParticipationRepository` → `EloquentParticipationRepository`) has no dedicated test; covered indirectly by the end-to-end feature test in slice piece 15
 
 #### Core audit findings (not blocking the slice)
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
