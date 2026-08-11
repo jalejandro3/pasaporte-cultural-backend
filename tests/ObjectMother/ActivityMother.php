@@ -8,7 +8,7 @@ class ActivityMother
 {
     public static function create(int $totalHours = 2): Activity
     {
-        return new Activity(
+        return Activity::create(
             'Activity Title',
             'Activity Description',
             'United States',

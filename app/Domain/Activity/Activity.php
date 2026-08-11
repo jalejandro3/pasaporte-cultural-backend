@@ -9,16 +9,33 @@ class Activity
     private string $id;
     private string $verificationCode;
 
-    public function __construct(
+    private function __construct(
         private readonly string $title,
         private readonly string $description,
         private readonly string $country,
         private readonly string $city,
         private readonly string $address,
         private readonly int $totalHours,
-    ) {
-        $this->generateId();
-        $this->generateVerificationCode();
+    ) {}
+
+    public static function create(string $title, string $description, string $country, string $city, string $address, int $totalHours): self
+    {
+        $activity = new Activity($title, $description, $country, $city, $address, $totalHours);
+
+        $activity->generateId();
+        $activity->generateVerificationCode();
+
+        return $activity;
+    }
+
+    public static function fromDatabase(string $id, string $title, string $description, string $country, string $city, string $address, int $totalHours,string $verificationCode): self
+    {
+        $activity = new Activity($title, $description, $country, $city, $address, $totalHours);
+
+        $activity->id = $id;
+        $activity->verificationCode = $verificationCode;
+
+        return $activity;
     }
 
     public function getId(): string
