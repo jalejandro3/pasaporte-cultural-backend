@@ -159,14 +159,14 @@ that the use case depends on persisting and reconstructing Activity and User
 4. ✅ Eloquent model
 5. ✅ Feature test — `save` against real DB
 6. ✅ Adapter `save` + container binding
-7. ⬜ Adapter `findByActivityIdAndAssistantId` (reconstructs Participation → needs Activity + User repos first)
+7. ⬜ Adapter `findByActivityIdAndAssistantId` (reconstructs Participation → needs User repo first)
 
 **Activity persistence** (required by the use case)
 8. ✅ Migration — `activities` table (UUID primary key)
 9. ✅ Domain — `create()` / `fromDatabase()` named constructors (separate creation from reconstitution)
 10. ✅ Eloquent model (`EloquentActivity`)
-11. ⬜ Adapter `EloquentActivityRepository` (`findById` reconstructs via `fromDatabase`)
-12. ⬜ Feature test + container binding
+11. ✅ Adapter `EloquentActivityRepository` (`findById` reconstructs via `fromDatabase`)
+12. ✅ Feature test (verifies full reconstitution) + container binding
 
 **User persistence** (required by the use case)
 13. ⬜ Eloquent model + adapter (reconcile desynced `users` table with domain entity)
@@ -177,7 +177,7 @@ that the use case depends on persisting and reconstructing Activity and User
 16. ⬜ Controller + `CreateParticipationRequest`
 17. ⬜ End-to-end feature test (HTTP → DB)
 
-**Next action:** piece 11 — `EloquentActivityRepository` adapter with `findById`.
+**Next action:** piece 13 — User persistence (reconcile the desynced `users` table with the domain entity).
 
 ### Backlog
 
@@ -190,6 +190,7 @@ that the use case depends on persisting and reconstructing Activity and User
 - ✅ Add MariaDB service to CI (feature tests now run against a real DB in the pipeline)
 - ✅ Unify Activity identity to UUID (removed int/UUID identifier inconsistency; all aggregates now domain-generated UUIDs)
 - ✅ Activity `create()` / `fromDatabase()` named constructors (private constructor; reconstitution never regenerates identity)
+- ✅ Activity persistence complete (`EloquentActivityRepository.findById` + feature test + container binding)
 
 #### CI / tooling (pending)
 - ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
@@ -199,14 +200,14 @@ that the use case depends on persisting and reconstructing Activity and User
 - ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
 
 #### Wiring not directly tested
-- ⬜ Container binding (`ParticipationRepository` → `EloquentParticipationRepository`) has no dedicated test; covered indirectly by the end-to-end feature test in slice piece 17
+- ⬜ Container bindings (`ParticipationRepository` / `ActivityRepository` → their Eloquent adapters) have no dedicated tests; covered indirectly by the end-to-end feature test in slice piece 17
 
 #### Core audit findings (not blocking the slice)
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
 - ⬜ Participation use cases don't validate the actor (unlike ChangeUserRole)
 - ⬜ `country` / `city` / `address` are plain strings, not value objects
 - ⬜ "Credits" mentioned in domain but no Credit concept exists
-- ⬜ `users` migration desynced from the `User` entity (missing `role`, `id_document`, `first_name`/`last_name`)
+- ⬜ `users` migration desynced from the `User` entity (missing `role`, `id_document`, `first_name`/`last_name`) — to be resolved in User persistence (piece 13)
 
 #### Deferred FKs (participations)
 - ⬜ Add FKs `participations.assistant_id` → `users` and `participations.activity_id` → `activities` (deferred until both target tables exist and are aligned)
@@ -228,7 +229,7 @@ that the use case depends on persisting and reconstructing Activity and User
 php artisan test
 ```
 
-Current test suite: **28 tests, 48 assertions**.
+Current test suite: **29 tests, 56 assertions**.
 
 ## Static Analysis
 
