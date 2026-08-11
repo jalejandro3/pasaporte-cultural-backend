@@ -101,7 +101,7 @@ Code is organized by **business concept**, not by technical type. Everything rel
 
 ## Domain Concepts
 
-All three aggregates (User, Activity, Participation) generate their own UUID identifiers in the domain, independent of the database.
+All three aggregates (User, Activity, Participation) generate their own UUID identifiers in the domain, independent of the database. Entities that are reconstructed from persistence expose a `fromDatabase()` named constructor, kept separate from `create()` so that rebuilding a stored entity never regenerates its identity.
 
 ### User
 
@@ -109,7 +109,7 @@ Represents anyone who interacts with the system. Has a role (`assistant` or `adm
 
 ### Activity
 
-A cultural event offered by UNIR. Generates its own UUID on creation. Has a title, location (country, city, address), required hours for completion, and a verification code (used for QR generation). The verification code can be regenerated, which invalidates the previous one.
+A cultural event offered by UNIR. Generates its own UUID on creation via `create()`; reconstructed from storage via `fromDatabase()`. Has a title, location (country, city, address), required hours for completion, and a verification code (used for QR generation). The verification code can be regenerated, which invalidates the previous one.
 
 ### Participation
 
@@ -162,20 +162,22 @@ that the use case depends on persisting and reconstructing Activity and User
 7. ⬜ Adapter `findByActivityIdAndAssistantId` (reconstructs Participation → needs Activity + User repos first)
 
 **Activity persistence** (required by the use case)
-8. ⬜ Migration — `activities` table (UUID primary key)
-9. ⬜ Eloquent model + adapter (`save`, `findById`)
-10. ⬜ Feature test + container binding
-
-**User persistence** (required by the use case)
-11. ⬜ Eloquent model + adapter (reconcile desynced `users` table with domain entity)
+8. ✅ Migration — `activities` table (UUID primary key)
+9. ✅ Domain — `create()` / `fromDatabase()` named constructors (separate creation from reconstitution)
+10. ✅ Eloquent model (`EloquentActivity`)
+11. ⬜ Adapter `EloquentActivityRepository` (`findById` reconstructs via `fromDatabase`)
 12. ⬜ Feature test + container binding
 
-**HTTP layer** (once persistence is complete)
-13. ⬜ Route `POST /api/participations`
-14. ⬜ Controller + `CreateParticipationRequest`
-15. ⬜ End-to-end feature test (HTTP → DB)
+**User persistence** (required by the use case)
+13. ⬜ Eloquent model + adapter (reconcile desynced `users` table with domain entity)
+14. ⬜ Feature test + container binding
 
-**Next action:** piece 8 — migration for the `activities` table (UUID primary key).
+**HTTP layer** (once persistence is complete)
+15. ⬜ Route `POST /api/participations`
+16. ⬜ Controller + `CreateParticipationRequest`
+17. ⬜ End-to-end feature test (HTTP → DB)
+
+**Next action:** piece 11 — `EloquentActivityRepository` adapter with `findById`.
 
 ### Backlog
 
@@ -187,6 +189,7 @@ that the use case depends on persisting and reconstructing Activity and User
 - ✅ ADR-0001: store participation status in the database
 - ✅ Add MariaDB service to CI (feature tests now run against a real DB in the pipeline)
 - ✅ Unify Activity identity to UUID (removed int/UUID identifier inconsistency; all aggregates now domain-generated UUIDs)
+- ✅ Activity `create()` / `fromDatabase()` named constructors (private constructor; reconstitution never regenerates identity)
 
 #### CI / tooling (pending)
 - ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
@@ -196,7 +199,7 @@ that the use case depends on persisting and reconstructing Activity and User
 - ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
 
 #### Wiring not directly tested
-- ⬜ Container binding (`ParticipationRepository` → `EloquentParticipationRepository`) has no dedicated test; covered indirectly by the end-to-end feature test in slice piece 15
+- ⬜ Container binding (`ParticipationRepository` → `EloquentParticipationRepository`) has no dedicated test; covered indirectly by the end-to-end feature test in slice piece 17
 
 #### Core audit findings (not blocking the slice)
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
@@ -225,7 +228,7 @@ that the use case depends on persisting and reconstructing Activity and User
 php artisan test
 ```
 
-Current test suite: **27 tests, 46 assertions**.
+Current test suite: **28 tests, 48 assertions**.
 
 ## Static Analysis
 
@@ -240,6 +243,7 @@ PHPStan (level 5) with the Larastan extension, run in CI on every push. Pre-exis
 - **TDD (Red-Green-Refactor)** — Every feature starts with a failing test.
 - **Hexagonal Architecture** — Domain is isolated from infrastructure.
 - **Architecture Decision Records** — Significant decisions documented in `docs/adr/`.
+- **Named constructors** — `create()` for new entities (generates identity), `fromDatabase()` for reconstitution from storage (receives identity). Constructor kept private.
 - **Static analysis** — PHPStan level 5 with Larastan, enforced in CI.
 - **Domain-specific exceptions** — Each business rule violation has its own exception class.
 - **Object Mother** — Test factories (`ActivityMother`, `AssistantMother`, `AdminMother`) reduce test setup noise.
