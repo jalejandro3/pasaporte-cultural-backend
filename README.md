@@ -64,6 +64,9 @@ app/
 │ ├── UserRepository.php
 │ └── UserRole.php
 ├── Infrastructure/
+│ ├── Activity/
+│ │ ├── EloquentActivity.php
+│ │ └── EloquentActivityRepository.php
 │ └── Participation/
 │ ├── EloquentParticipation.php
 │ └── EloquentParticipationRepository.php
@@ -90,7 +93,9 @@ tests/
 │ ├── ActivityTest.php
 │ ├── ParticipationTest.php
 │ └── UserTest.php
-├── Feature/ # empty — first feature test lands with the CreateParticipation slice
+├── Feature/
+│ ├── EloquentActivityRepositoryTest.php
+│ └── EloquentParticipationRepositoryTest.php
 ├── ObjectMother/
 │ ├── ActivityMother.php
 │ ├── AdminMother.php
