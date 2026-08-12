@@ -1,4 +1,5 @@
 [![CI](https://github.com/jalejandro3/pasaporte-cultural-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/jalejandro3/pasaporte-cultural-backend/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/jalejandro3/pasaporte-cultural-backend/graph/badge.svg?token=JP7IEQ8RX5)](https://codecov.io/github/jalejandro3/pasaporte-cultural-backend)
 
 # Pasaporte Cultural UNIR — Backend
 
