@@ -1,5 +1,7 @@
 [![CI](https://github.com/jalejandro3/pasaporte-cultural-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/jalejandro3/pasaporte-cultural-backend/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/github/jalejandro3/pasaporte-cultural-backend/graph/badge.svg?token=JP7IEQ8RX5)](https://codecov.io/github/jalejandro3/pasaporte-cultural-backend)
+![PHP](https://img.shields.io/badge/PHP-8.4-777BB4)
+![PHPStan](https://img.shields.io/badge/PHPStan-level%205-2EBB4E)
 
 # Pasaporte Cultural UNIR — Backend
 
@@ -192,13 +194,15 @@ that the use case depends on persisting and reconstructing Activity and User
 - ✅ Unify Activity identity to UUID (removed int/UUID identifier inconsistency; all aggregates now domain-generated UUIDs)
 - ✅ Activity `create()` / `fromDatabase()` named constructors (private constructor; reconstitution never regenerates identity)
 - ✅ Activity persistence complete (`EloquentActivityRepository.findById` + feature test + container binding)
-
-#### CI / tooling (pending)
-- ⬜ Coverage reporting (Codecov): enable coverage, publish badge, track over time — account already created
+- ✅ Code coverage reporting via Codecov (95%, PCOV + Clover, uploaded from CI on every push)
 
 #### PHPStan baseline (tracked debt — resolve, don't grow)
 - ⬜ `User::$firstName / $lastName / $idDocument` never read → resolved by ShowProfile use case
 - ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
+
+#### CI configuration debt
+- ⬜ CI DB connection relies on an empty password against a root-password MariaDB — works via container behavior but is fragile; make credentials explicit and consistent across `.env.example`, `phpunit.xml`, and the CI service
+- ⬜ Node 20 deprecation warning from `codecov/codecov-action` (internal dependency of the action; resolves when Codecov updates — not actionable now)
 
 #### Wiring not directly tested
 - ⬜ Container bindings (`ParticipationRepository` / `ActivityRepository` → their Eloquent adapters) have no dedicated tests; covered indirectly by the end-to-end feature test in slice piece 17
@@ -222,6 +226,7 @@ that the use case depends on persisting and reconstructing Activity and User
 - **PHP 8.4** with **Laravel**
 - **PHPUnit 12** for testing
 - **PHPStan 2 + Larastan** for static analysis (level 5)
+- **Codecov** for coverage reporting (PCOV + Clover)
 - **Ramsey UUID** for domain-generated identifiers
 
 ## Running Tests
@@ -229,8 +234,6 @@ that the use case depends on persisting and reconstructing Activity and User
 ```bash
 php artisan test
 ```
-
-Current test suite: **29 tests, 56 assertions**.
 
 ## Static Analysis
 
@@ -247,6 +250,7 @@ PHPStan (level 5) with the Larastan extension, run in CI on every push. Pre-exis
 - **Architecture Decision Records** — Significant decisions documented in `docs/adr/`.
 - **Named constructors** — `create()` for new entities (generates identity), `fromDatabase()` for reconstitution from storage (receives identity). Constructor kept private.
 - **Static analysis** — PHPStan level 5 with Larastan, enforced in CI.
+- **Coverage tracking** — line coverage reported to Codecov on every push (PCOV + Clover).
 - **Domain-specific exceptions** — Each business rule violation has its own exception class.
 - **Object Mother** — Test factories (`ActivityMother`, `AssistantMother`, `AdminMother`) reduce test setup noise.
 - **Immutable DTOs** — Data Transfer Objects with `final readonly` and `fromEntity()` factory methods.
