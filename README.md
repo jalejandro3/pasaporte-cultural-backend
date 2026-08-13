@@ -71,7 +71,8 @@ app/
 │   │   ├── EloquentParticipation.php
 │   │   └── EloquentParticipationRepository.php
 │   └── User/
-│       └── EloquentUser.php
+│       ├── EloquentUser.php
+│       └── EloquentUserRepository.php
 ├── Http/
 │   └── Controllers/
 │       └── Controller.php
@@ -95,7 +96,8 @@ tests/
 │       └── UserTest.php
 ├── Feature/
 │   ├── EloquentActivityRepositoryTest.php
-│   └── EloquentParticipationRepositoryTest.php
+│   ├── EloquentParticipationRepositoryTest.php
+│   └── EloquentUserRepositoryTest.php
 ├── ObjectMother/
 │   ├── ActivityMother.php
 │   ├── AdminMother.php
@@ -180,15 +182,16 @@ that the use case depends on persisting and reconstructing Activity and User
 13. ✅ Migration — reconcile `users` table with domain (UUID PK, first/last name, id_document, role as string; keep auth columns; split `sessions` and `password_reset_tokens` into own migrations)
 14. ✅ `EloquentUser` model — moved from `app/Models` to `Infrastructure/User` (UUID key, domain fillable, `'hashed'` cast, `Notifiable`); `config/auth.php` repointed
 15. ✅ Domain — `create()` / `fromDatabase()` named constructors on `User` (email validation in `create()` only)
-16. ⬜ Adapter `EloquentUserRepository` (`save` with password, `findByEmail`, `findByIdDocument`, `countAdmins`)
-17. ⬜ Feature test + container binding
+16. ✅ Adapter `EloquentUserRepository` — `save(User, password)` (hashed via cast, password kept out of domain) + `update(User)` (domain fields only, password untouched); getters added to `User` (cleared PHPStan baseline)
+17. ✅ Feature tests (`save` asserts password hashed, `update` asserts password untouched); `ChangeUserRole` switched from `save` to `update`
+18. ⬜ Container binding `UserRepository` → `EloquentUserRepository`
 
 **HTTP layer** (once persistence is complete)
-18. ⬜ Route `POST /api/participations`
-19. ⬜ Controller + `CreateParticipationRequest`
-20. ⬜ End-to-end feature test (HTTP → DB)
+19. ⬜ Route `POST /api/participations`
+20. ⬜ Controller + `CreateParticipationRequest`
+21. ⬜ End-to-end feature test (HTTP → DB)
 
-**Next action:** piece 16 — `EloquentUserRepository` adapter (`save` with password via `'hashed'` cast, `findBy*` reconstruct via `fromDatabase`, `countAdmins`).
+**Next action:** piece 18 — bind `UserRepository` to `EloquentUserRepository` in `AppServiceProvider`. Then piece 7 (Participation `findByActivityIdAndAssistantId`, now unblocked) before the HTTP layer.
 
 ### Backlog
 
@@ -204,11 +207,13 @@ that the use case depends on persisting and reconstructing Activity and User
 - ✅ Activity persistence complete (`EloquentActivityRepository.findById` + feature test + container binding)
 - ✅ Code coverage reporting via Codecov (95%, PCOV + Clover, uploaded from CI on every push)
 - ✅ Enums as strings (`ParticipationStatus`, `UserRole`): domain is single source of truth; DB stores strings, not native enums
-- ✅ User persistence — migration reconciled, `EloquentUser` moved to Infrastructure, `create()`/`fromDatabase()` named constructors (adapter pending)
+- ✅ User persistence complete — migration reconciled, `EloquentUser` in Infrastructure, `create()`/`fromDatabase()` named constructors, adapter with `save` (password) + `update` (no password), `ChangeUserRole` uses `update`
+- ✅ Separate `save`/`update` on `UserRepository` — registration (with password) vs. domain update (without); surfaced by ChangeUserRole misusing `save` for a role change
+- ✅ Clear PHPStan baseline — `getFirstName`/`getLastName`/`getIdDocument` added to `User` (baseline now empty)
 
 #### PHPStan baseline (tracked debt — resolve, don't grow)
-- ⬜ `User::$firstName / $lastName / $idDocument` never read → resolved by ShowProfile use case
-- ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows, clearing baseline entries
+- ✅ `User::$firstName / $lastName / $idDocument` never read → resolved (getters added for the adapter; baseline cleared)
+- ⬜ Raise PHPStan level gradually (5 → 6 → 7…) as code allows
 
 #### CI configuration debt
 - ⬜ CI DB connection relies on an empty password against a root-password MariaDB — works via container behavior but is fragile; make credentials explicit and consistent across `.env.example`, `phpunit.xml`, and the CI service
