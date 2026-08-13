@@ -26,9 +26,10 @@ class CreateAssistantTest extends TestCase
             'id_document' => '123456789',
             'email' => 'assistant@unir.net'
         ]);
+        $password = 'password';
 
         $createAssistant = new CreateAssistant($userRepository);
-        $newAssistant = $createAssistant->execute($assistantDto);
+        $newAssistant = $createAssistant->execute($assistantDto, $password);
 
         $this->assertSame('assistant@unir.net', $newAssistant->getEmail());
     }
@@ -42,13 +43,14 @@ class CreateAssistantTest extends TestCase
             'id_document' => '123456789',
             'email' => 'assistant@gmail.com'
         ]);
+        $password = 'password';
 
         $createAssistant = new CreateAssistant($userRepository);
 
         $this->expectException(InvalidEmailDomainException::class);
         $this->expectExceptionMessage('Invalid email domain.');
 
-        $createAssistant->execute($assistantDto);
+        $createAssistant->execute($assistantDto, $password);
     }
 
     public function test_create_existing_email_assistant_throws_exception()
@@ -59,6 +61,7 @@ class CreateAssistantTest extends TestCase
             'id_document' => '123456789',
             'email' => 'assistant@unir.net'
         ];
+        $password = 'password';
 
         $existingAssistant = User::create(
             $assistantData['first_name'],
@@ -79,7 +82,7 @@ class CreateAssistantTest extends TestCase
         $this->expectException(UserExistsException::class);
         $this->expectExceptionMessage('Assistant with this email already exists.');
 
-        $createAssistant->execute($assistantDto);
+        $createAssistant->execute($assistantDto, $password);
     }
 
     public function test_create_existing_id_document_assistant_throws_exception()
@@ -90,6 +93,7 @@ class CreateAssistantTest extends TestCase
             'id_document' => '123456789',
             'email' => 'assistant@unir.net',
         ];
+        $password = 'password';
 
         $existingAssistant = User::create(
             $assistantData['first_name'],
@@ -110,6 +114,6 @@ class CreateAssistantTest extends TestCase
         $this->expectException(UserExistsException::class);
         $this->expectExceptionMessage('Assistant with this id document already exists.');
 
-        $createAssistant->execute($assistantDto);
+        $createAssistant->execute($assistantDto, $password);
     }
 }

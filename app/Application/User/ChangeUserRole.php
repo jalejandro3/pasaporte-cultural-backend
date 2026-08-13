@@ -36,6 +36,6 @@ readonly class ChangeUserRole
         }
 
         $user->setRole($role);
-        $this->userRepository->save($user);
+        $this->userRepository->update($user);
     }
 }

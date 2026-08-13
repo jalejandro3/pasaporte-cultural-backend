@@ -22,8 +22,32 @@ class EloquentUserRepository implements UserRepository
         throw new \RuntimeException('Not implemented yet');
     }
 
-    public function save(User $user): void
+    public function save(User $user, string $password): void
     {
-        throw new \RuntimeException('Not implemented yet');
+        $userData = [
+            'id' => $user->getId(),
+            'first_name' => $user->getFirstName(),
+            'last_name' => $user->getLastName(),
+            'id_document' => $user->getIdDocument(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole()->value
+        ];
+
+        if ($password) {
+            $userData['password'] = $password;
+        }
+
+        EloquentUser::create($userData);
+    }
+
+    public function update(User $user): void
+    {
+        EloquentUser::where('id', $user->getId())->update([
+            'first_name' => $user->getFirstName(),
+            'last_name' => $user->getLastName(),
+            'id_document' => $user->getIdDocument(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole()->value
+        ]);
     }
 }

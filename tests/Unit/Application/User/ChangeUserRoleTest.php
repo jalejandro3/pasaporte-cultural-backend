@@ -22,7 +22,7 @@ class ChangeUserRoleTest extends TestCase
         $userRepository = $this->createMock(UserRepository::class);
 
         $userRepository->method('findByEmail')->willReturn($user);
-        $userRepository->expects($this->once())->method('save');
+        $userRepository->expects($this->once())->method('update');
 
         $changeUserRole = new ChangeUserRole($userRepository);
 

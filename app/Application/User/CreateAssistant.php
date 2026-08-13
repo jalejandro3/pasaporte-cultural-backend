@@ -10,7 +10,7 @@ readonly class CreateAssistant
 {
     public function __construct(private UserRepository $userRepository) {}
 
-    public function execute(UserDTO $assistantDTO): User
+    public function execute(UserDTO $assistantDTO, string $password): User
     {
         $domain = explode('@', $assistantDTO->email)[1];
 
@@ -38,7 +38,7 @@ readonly class CreateAssistant
             UserRole::ASSISTANT
         );
 
-        $this->userRepository->save($assistant);
+        $this->userRepository->save($assistant, $password);
 
         return $assistant;
     }
