@@ -12,7 +12,7 @@ class UserTest extends TestCase
     public function test_user_creation_with_invalid_email_format_throws_exception()
     {
         $this->expectException(InvalidEmailFormatException::class);
-        new User(
+        User::create(
             'John',
             'Doe',
             '1234567890',

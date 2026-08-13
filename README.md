@@ -30,76 +30,76 @@ Significant technical decisions are recorded as ADRs (Architecture Decision Reco
 ```
 app/
 ├── Application/
-│ ├── Activity/
-│ │ ├── ActivityDTO.php
-│ │ └── ShowActivity.php
-│ ├── Participation/
-│ │ ├── CreateParticipation.php
-│ │ ├── FinishParticipation.php
-│ │ ├── NotFoundParticipationException.php
-│ │ ├── ParticipationExistsException.php
-│ │ └── ParticipationVerificationCodeMismatchException.php
-│ └── User/
-│ ├── AssignmentRoleException.php
-│ ├── CannotDemoteLastAdminException.php
-│ ├── ChangeUserRole.php
-│ ├── CreateAssistant.php
-│ ├── InvalidEmailDomainException.php
-│ ├── NonExistentUserException.php
-│ ├── UserDTO.php
-│ └── UserExistsException.php
+│   ├── Activity/
+│   │   ├── ActivityDTO.php
+│   │   └── ShowActivity.php
+│   ├── Participation/
+│   │   ├── CreateParticipation.php
+│   │   ├── FinishParticipation.php
+│   │   ├── NotFoundParticipationException.php
+│   │   ├── ParticipationExistsException.php
+│   │   └── ParticipationVerificationCodeMismatchException.php
+│   └── User/
+│       ├── AssignmentRoleException.php
+│       ├── CannotDemoteLastAdminException.php
+│       ├── ChangeUserRole.php
+│       ├── CreateAssistant.php
+│       ├── InvalidEmailDomainException.php
+│       ├── NonExistentUserException.php
+│       ├── UserDTO.php
+│       └── UserExistsException.php
 ├── Domain/
-│ ├── Activity/
-│ │ ├── Activity.php
-│ │ └── ActivityRepository.php
-│ ├── Participation/
-│ │ ├── FinishedParticipationException.php
-│ │ ├── Participation.php
-│ │ ├── ParticipationRepository.php
-│ │ ├── ParticipationStatus.php
-│ │ └── PriorEndDateParticipationException.php
-│ └── User/
-│ ├── InvalidEmailFormatException.php
-│ ├── User.php
-│ ├── UserRepository.php
-│ └── UserRole.php
+│   ├── Activity/
+│   │   ├── Activity.php
+│   │   └── ActivityRepository.php
+│   ├── Participation/
+│   │   ├── FinishedParticipationException.php
+│   │   ├── Participation.php
+│   │   ├── ParticipationRepository.php
+│   │   ├── ParticipationStatus.php
+│   │   └── PriorEndDateParticipationException.php
+│   └── User/
+│       ├── InvalidEmailFormatException.php
+│       ├── User.php
+│       ├── UserRepository.php
+│       └── UserRole.php
 ├── Infrastructure/
-│ ├── Activity/
-│ │ ├── EloquentActivity.php
-│ │ └── EloquentActivityRepository.php
-│ └── Participation/
-│ ├── EloquentParticipation.php
-│ └── EloquentParticipationRepository.php
+│   ├── Activity/
+│   │   ├── EloquentActivity.php
+│   │   └── EloquentActivityRepository.php
+│   ├── Participation/
+│   │   ├── EloquentParticipation.php
+│   │   └── EloquentParticipationRepository.php
+│   └── User/
+│       └── EloquentUser.php
 ├── Http/
-│ └── Controllers/
-│ └── Controller.php
-├── Models/
-│ └── User.php
+│   └── Controllers/
+│       └── Controller.php
 └── Providers/
-└── AppServiceProvider.php
+    └── AppServiceProvider.php
 
 tests/
 ├── Unit/
-│ ├── Application/
-│ │ ├── Activity/
-│ │ │ └── ShowActivityTest.php
-│ │ ├── Participation/
-│ │ │ ├── CreateParticipationTest.php
-│ │ │ └── FinishParticipationTest.php
-│ │ └── User/
-│ │ ├── ChangeUserRoleTest.php
-│ │ └── CreateAssistantTest.php
-│ └── Domain/
-│ ├── ActivityTest.php
-│ ├── ParticipationTest.php
-│ └── UserTest.php
+│   ├── Application/
+│   │   ├── Activity/
+│   │   │   └── ShowActivityTest.php
+│   │   ├── Participation/
+│   │   │   ├── CreateParticipationTest.php
+│   │   │   └── FinishParticipationTest.php
+│   │   └── User/
+│   │       ├── ChangeUserRoleTest.php
+│   │       └── CreateAssistantTest.php
+│   └── Domain/
+│       ├── ActivityTest.php
+│       ├── ParticipationTest.php
+│       └── UserTest.php
 ├── Feature/
-│ ├── EloquentActivityRepositoryTest.php
-│ └── EloquentParticipationRepositoryTest.php
+│   ├── EloquentActivityRepositoryTest.php
+│   └── EloquentParticipationRepositoryTest.php
 ├── ObjectMother/
-│ ├── ActivityMother.php
-│ ├── AdminMother.php
-│ └── AssistantMother.php
+│   ├── ActivityMother.php
+│   ├── AdminMother.php
+│   └── AssistantMother.php
 └── TestCase.php
 ```
 
@@ -177,15 +177,18 @@ that the use case depends on persisting and reconstructing Activity and User
 12. ✅ Feature test (verifies full reconstitution) + container binding
 
 **User persistence** (required by the use case)
-13. ⬜ Eloquent model + adapter (reconcile desynced `users` table with domain entity)
-14. ⬜ Feature test + container binding
+13. ✅ Migration — reconcile `users` table with domain (UUID PK, first/last name, id_document, role as string; keep auth columns; split `sessions` and `password_reset_tokens` into own migrations)
+14. ✅ `EloquentUser` model — moved from `app/Models` to `Infrastructure/User` (UUID key, domain fillable, `'hashed'` cast, `Notifiable`); `config/auth.php` repointed
+15. ✅ Domain — `create()` / `fromDatabase()` named constructors on `User` (email validation in `create()` only)
+16. ⬜ Adapter `EloquentUserRepository` (`save` with password, `findByEmail`, `findByIdDocument`, `countAdmins`)
+17. ⬜ Feature test + container binding
 
 **HTTP layer** (once persistence is complete)
-15. ⬜ Route `POST /api/participations`
-16. ⬜ Controller + `CreateParticipationRequest`
-17. ⬜ End-to-end feature test (HTTP → DB)
+18. ⬜ Route `POST /api/participations`
+19. ⬜ Controller + `CreateParticipationRequest`
+20. ⬜ End-to-end feature test (HTTP → DB)
 
-**Next action:** piece 13 — User persistence (reconcile the desynced `users` table with the domain entity).
+**Next action:** piece 16 — `EloquentUserRepository` adapter (`save` with password via `'hashed'` cast, `findBy*` reconstruct via `fromDatabase`, `countAdmins`).
 
 ### Backlog
 
@@ -200,6 +203,8 @@ that the use case depends on persisting and reconstructing Activity and User
 - ✅ Activity `create()` / `fromDatabase()` named constructors (private constructor; reconstitution never regenerates identity)
 - ✅ Activity persistence complete (`EloquentActivityRepository.findById` + feature test + container binding)
 - ✅ Code coverage reporting via Codecov (95%, PCOV + Clover, uploaded from CI on every push)
+- ✅ Enums as strings (`ParticipationStatus`, `UserRole`): domain is single source of truth; DB stores strings, not native enums
+- ✅ User persistence — migration reconciled, `EloquentUser` moved to Infrastructure, `create()`/`fromDatabase()` named constructors (adapter pending)
 
 #### PHPStan baseline (tracked debt — resolve, don't grow)
 - ⬜ `User::$firstName / $lastName / $idDocument` never read → resolved by ShowProfile use case
@@ -213,11 +218,11 @@ that the use case depends on persisting and reconstructing Activity and User
 - ⬜ Container bindings (`ParticipationRepository` / `ActivityRepository` → their Eloquent adapters) have no dedicated tests; covered indirectly by the end-to-end feature test in slice piece 17
 
 #### Core audit findings (not blocking the slice)
+- ✅ `users` table reconciled with the `User` entity (was missing `role`, `id_document`, `first_name`/`last_name`) — done in User persistence
 - ⬜ `ShowActivity` does not handle activity-not-found (same null bug fixed in ChangeUserRole)
 - ⬜ Participation use cases don't validate the actor (unlike ChangeUserRole)
 - ⬜ `country` / `city` / `address` are plain strings, not value objects
 - ⬜ "Credits" mentioned in domain but no Credit concept exists
-- ⬜ `users` migration desynced from the `User` entity (missing `role`, `id_document`, `first_name`/`last_name`) — to be resolved in User persistence (piece 13)
 
 #### Deferred FKs (participations)
 - ⬜ Add FKs `participations.assistant_id` → `users` and `participations.activity_id` → `activities` (deferred until both target tables exist and are aligned)

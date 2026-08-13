@@ -9,7 +9,7 @@ class AdminMother
 {
     public static function create(): User
     {
-        return new User(
+        return User::create(
             'admin',
             'admin',
             '0000000000',

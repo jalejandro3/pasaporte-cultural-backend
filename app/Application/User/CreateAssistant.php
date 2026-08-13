@@ -30,7 +30,7 @@ readonly class CreateAssistant
             throw new UserExistsException('Assistant with this id document already exists.');
         }
 
-        $assistant = new User(
+        $assistant = User::create(
             $assistantDTO->firstName,
             $assistantDTO->lastName,
             $assistantDTO->idDocument,

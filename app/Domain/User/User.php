@@ -8,7 +8,7 @@ class User
 {
     private string $id;
 
-    public function __construct(
+    private function __construct(
         private readonly string $firstName,
         private readonly string $lastName,
         private readonly string $idDocument,
@@ -16,11 +16,27 @@ class User
         private UserRole $role
     )
     {
+    }
+
+    public static function create(string $firstName, string $lastName, string $idDocument, string $email, UserRole $role): self
+    {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidEmailFormatException();
         }
 
-        $this->generateId();
+        $user = new User($firstName, $lastName, $idDocument, $email, $role);
+
+        $user->generateId();
+
+        return $user;
+    }
+
+    public static function fromDatabase(string $id, string $firstName, string $lastName, string $idDocument, string $email, UserRole $role): self
+    {
+        $user = new User($firstName, $lastName, $idDocument, $email, $role);
+        $user->id = $id;
+
+        return $user;
     }
 
     public function getId(): string

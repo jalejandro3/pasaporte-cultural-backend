@@ -60,7 +60,7 @@ class CreateAssistantTest extends TestCase
             'email' => 'assistant@unir.net'
         ];
 
-        $existingAssistant = new User(
+        $existingAssistant = User::create(
             $assistantData['first_name'],
             $assistantData['last_name'],
             $assistantData['id_document'],
@@ -91,7 +91,7 @@ class CreateAssistantTest extends TestCase
             'email' => 'assistant@unir.net',
         ];
 
-        $existingAssistant = new User(
+        $existingAssistant = User::create(
             $assistantData['first_name'],
             $assistantData['last_name'],
             $assistantData['id_document'],
