@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Domain\Activity\ActivityRepository;
 use App\Domain\Participation\ParticipationRepository;
+use App\Domain\User\UserRepository;
 use App\Infrastructure\Activity\EloquentActivityRepository;
 use App\Infrastructure\Participation\EloquentParticipationRepository;
+use App\Infrastructure\User\EloquentUserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,8 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(ParticipationRepository::class, EloquentParticipationRepository::class);
         $this->app->bind(ActivityRepository::class, EloquentActivityRepository::class);
+        $this->app->bind(ParticipationRepository::class, EloquentParticipationRepository::class);
+        $this->app->bind(UserRepository::class, EloquentUserRepository::class);
     }
 
     /**
