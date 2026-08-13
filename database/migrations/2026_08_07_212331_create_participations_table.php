@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('assistant_id');
             $table->uuid('activity_id');
-            $table->enum('status', ['IN_PROCESS', 'COMPLETED', 'NOT_COMPLETED']);
+            $table->string('status');
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
             $table->timestamps();

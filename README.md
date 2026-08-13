@@ -226,6 +226,12 @@ that the use case depends on persisting and reconstructing Activity and User
 #### Auth debt
 - ⬜ `assistant_id` will come from the request body temporarily; once auth exists, it must come from the authenticated user (impersonation risk until then)
 
+#### Auth infrastructure debt (Laravel tables kept as-is for now)
+- ⬜ `sessions` table: `user_id` is `foreignId` (BIGINT), doesn't match `users.id` (UUID). Harmless while sessions aren't used in DB (stateless token API). Revisit with the session-driver decision during auth phase.
+- ⬜ Session driver is `database` (default from Laravel). For a stateless token API, sessions in DB are likely unnecessary. Evaluate switching driver (cookie/array) and dropping the `sessions` table when implementing auth.
+- ⬜ `password_reset_tokens` table kept from Laravel OOTB. Confirm whether password-reset-by-email is in scope; drop if not.
+- ⬜ `password` persisted via the `EloquentUser` model's `'hashed'` cast; domain never handles it — enters through use case and repository as an explicit auth concern (see pending ADR).
+
 ## Tech Stack
 
 - **PHP 8.4** with **Laravel**
