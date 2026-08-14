@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Domain;
+namespace Tests\Unit\Domain\Participation;
 
 use App\Domain\Participation\FinishedParticipationException;
 use App\Domain\Participation\Participation;

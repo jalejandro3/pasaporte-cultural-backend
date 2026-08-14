@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Domain;
+namespace Tests\Unit\Domain\User;
 
 use App\Domain\User\InvalidEmailFormatException;
 use App\Domain\User\User;
