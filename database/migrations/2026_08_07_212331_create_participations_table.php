@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('participations', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->uuid('assistant_id');
             $table->uuid('activity_id');
+            $table->unsignedInteger('required_hours');
             $table->string('status');
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();

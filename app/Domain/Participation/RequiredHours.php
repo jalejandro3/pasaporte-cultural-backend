@@ -18,4 +18,9 @@ readonly class RequiredHours
     {
         return $hours >= $this->totalHours;
     }
+
+    public function getTotalHours(): int
+    {
+        return $this->totalHours;
+    }
 }

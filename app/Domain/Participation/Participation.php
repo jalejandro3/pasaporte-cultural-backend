@@ -53,6 +53,11 @@ class Participation
         return $this->activityId;
     }
 
+    public function getRequiredHours(): RequiredHours
+    {
+        return $this->requiredHours;
+    }
+
     public function getStartTime(): \DateTimeImmutable
     {
         return $this->startTime;
