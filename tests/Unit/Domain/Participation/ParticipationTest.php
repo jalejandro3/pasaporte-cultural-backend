@@ -17,7 +17,7 @@ class ParticipationTest extends TestCase
         $activity = ActivityMother::create(2);
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $this->assertSame(ParticipationStatus::IN_PROCESS, $participation->status());
     }
@@ -28,7 +28,7 @@ class ParticipationTest extends TestCase
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
         $endTime = new \DateTimeImmutable('+2 hour');
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $participation->finish($endTime);
 
@@ -41,7 +41,7 @@ class ParticipationTest extends TestCase
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
         $endTime = new \DateTimeImmutable('+1 hour');
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $participation->finish($endTime);
 
@@ -54,7 +54,7 @@ class ParticipationTest extends TestCase
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
         $endTime = new \DateTimeImmutable('+2 hour');
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $participation->finish($endTime);
 
@@ -70,7 +70,7 @@ class ParticipationTest extends TestCase
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
         $endTime = new \DateTimeImmutable('+1 hour');
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $participation->finish($endTime);
 
@@ -86,7 +86,7 @@ class ParticipationTest extends TestCase
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
         $endTime = new \DateTimeImmutable('-1 hour');
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $this->ExpectException(PriorEndDateParticipationException::class);
         $this->ExpectExceptionMessage('The end time cannot be before the start time.');

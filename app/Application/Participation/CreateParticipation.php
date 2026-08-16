@@ -27,7 +27,7 @@ readonly class CreateParticipation
             throw new ParticipationExistsException('Assistant already participated in this activity.');
         }
 
-        $newParticipation = new Participation($assistant, $activity, $startTime);
+        $newParticipation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
 
         $this->participationRepository->save($newParticipation);
 

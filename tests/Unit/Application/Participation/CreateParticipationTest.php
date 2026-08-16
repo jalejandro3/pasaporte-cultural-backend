@@ -37,7 +37,7 @@ class CreateParticipationTest extends TestCase
         $activity = ActivityMother::create(2);
         $verificationCode = $activity->getVerificationCode();
         $assistant = AssistantMother::create();
-        $participation = new Participation($assistant, $activity, new \DateTimeImmutable());
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), new \DateTimeImmutable());
         $startTime = new \DateTimeImmutable();
         $participationRepository = $this->createStub(ParticipationRepository::class);
 

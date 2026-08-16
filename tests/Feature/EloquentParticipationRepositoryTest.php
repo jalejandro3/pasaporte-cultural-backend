@@ -18,7 +18,7 @@ class EloquentParticipationRepositoryTest extends TestCase
         $activity = ActivityMother::create(2);
         $assistant = AssistantMother::create();
         $startTime = new \DateTimeImmutable();
-        $participation = new Participation($assistant, $activity, $startTime);
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
         $participationRepository = new EloquentParticipationRepository();
 
         $participationRepository->save($participation);

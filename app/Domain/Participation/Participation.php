@@ -2,34 +2,62 @@
 
 namespace App\Domain\Participation;
 
-use App\Domain\Activity\Activity;
-use App\Domain\User\User;
-
 class Participation
 {
+    private ParticipationId $id;
+    private RequiredHours $requiredHours;
     private \DateTimeImmutable|null $endTime = null;
 
-    public function __construct(
-        private readonly User $assistant,
-        private readonly Activity $activity,
+    private function __construct(
+        private readonly string $assistantId,
+        private readonly string $activityId,
+        int $activityTotalHours,
         private readonly \DateTimeImmutable $startTime,
-    ) {}
-
-    public function getAssistant(): User
-    {
-        return $this->assistant;
+    ) {
+        $this->requiredHours = new RequiredHours($activityTotalHours);
     }
 
-    public function getActivity(): Activity
+    public static function create(string $assistantId, string $activityId, int $activityTotalHours, \DateTimeImmutable $startTime): self
     {
-        return $this->activity;
+        $participation = new Participation($assistantId, $activityId, $activityTotalHours, $startTime);
+        $participation->id = ParticipationId::generate();
+
+        return $participation;
+    }
+
+    public static function fromDatabase(string $id, string $assistantId, string $activityId, int $activityTotalHours, \DateTimeImmutable $startTime, \DateTimeImmutable|null $endTime): self
+    {
+        $participation = new Participation($assistantId, $activityId, $activityTotalHours, $startTime);
+
+        if ($endTime) {
+            $participation->endTime = $endTime;
+        }
+
+        $participation->id = ParticipationId::fromString($id);
+
+        return $participation;
+    }
+
+    public function getId(): ParticipationId
+    {
+        return $this->id;
+    }
+
+    public function getAssistantId(): string
+    {
+        return $this->assistantId;
+    }
+
+    public function getActivityId(): string
+    {
+        return $this->activityId;
     }
 
     public function getStartTime(): \DateTimeImmutable
     {
         return $this->startTime;
     }
-    
+
     public function getEndTime(): \DateTimeImmutable|null
     {
         return $this->endTime;
@@ -40,7 +68,7 @@ class Participation
         if ($this->endTime) {
             $participationHours = ($this->endTime->getTimestamp() - $this->startTime->getTimestamp()) / 3600;
 
-            if ($participationHours >= $this->activity->getTotalHours()) {
+            if ($this->requiredHours->isSatisfiedBy($participationHours)) {
                 return ParticipationStatus::COMPLETED;
             }
 

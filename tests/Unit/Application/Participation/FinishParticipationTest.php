@@ -19,7 +19,7 @@ class FinishParticipationTest extends TestCase
         $activity = ActivityMother::create(2);
         $verificationCode = $activity->getVerificationCode();
         $assistant = AssistantMother::create();
-        $participation = new Participation($assistant, $activity, new \DateTimeImmutable());
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), new \DateTimeImmutable());
         $participationRepository = $this->createMock(ParticipationRepository::class);
 
         $participationRepository->method('findByActivityIdAndAssistantId')->willReturn($participation);
@@ -37,7 +37,7 @@ class FinishParticipationTest extends TestCase
         $activity = ActivityMother::create(2);
         $verificationCode = $activity->getVerificationCode();
         $assistant = AssistantMother::create();
-        $participation = new Participation($assistant, $activity, new \DateTimeImmutable());
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), new \DateTimeImmutable());
         $participationRepository = $this->createMock(ParticipationRepository::class);
 
         $participationRepository->method('findByActivityIdAndAssistantId')->willReturn($participation);
