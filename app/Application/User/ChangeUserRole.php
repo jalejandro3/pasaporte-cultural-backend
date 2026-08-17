@@ -13,7 +13,7 @@ readonly class ChangeUserRole
     /**
      * @throws AssignmentRoleException
      * @throws CannotDemoteLastAdminException
-     * @throws NonExistentUserException
+     * @throws NotFoundUserException
      */
     public function execute(User $actor, string $email, UserRole $role): void
     {
@@ -24,7 +24,7 @@ readonly class ChangeUserRole
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
-            throw new NonExistentUserException('You cannot change role for non-existent user.');
+            throw new NotFoundUserException('You cannot change role for non-existent user.');
         }
 
         if ($role === $user->getRole()) {
