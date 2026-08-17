@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Domain\User\UserRole;
+use App\Infrastructure\User\EloquentUser;
 use App\Infrastructure\User\EloquentUserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\ObjectMother\AssistantMother;
 use Tests\TestCase;
 
@@ -51,5 +53,23 @@ class EloquentUserRepositoryTest extends TestCase
         ]);
 
         $this->assertTrue(\Hash::check($password, $storedUser->password));
+    }
+
+    public function test_find_by_id()
+    {
+        $assistant = AssistantMother::create();
+        $password = 'password';
+        $userRepository = new EloquentUserRepository();
+
+        $userRepository->save($assistant, $password);
+
+        $foundUser = $userRepository->findById($assistant->getId());
+
+        $this->assertEquals($assistant->getId(), $foundUser->getId());
+        $this->assertEquals($assistant->getFirstName(), $foundUser->getFirstName());
+        $this->assertEquals($assistant->getLastName(), $foundUser->getLastName());
+        $this->assertEquals($assistant->getIdDocument(), $foundUser->getIdDocument());
+        $this->assertEquals($assistant->getEmail(), $foundUser->getEmail());
+        $this->assertEquals($assistant->getRole(), $foundUser->getRole());
     }
 }
