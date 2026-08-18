@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Infrastructure\Activity;
 
 use App\Infrastructure\Activity\EloquentActivity;
 use App\Infrastructure\Activity\EloquentActivityRepository;

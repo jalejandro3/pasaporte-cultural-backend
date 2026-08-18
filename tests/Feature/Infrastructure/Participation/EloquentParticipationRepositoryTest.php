@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Infrastructure\Participation;
 
 use App\Domain\Participation\Participation;
 use App\Domain\Participation\ParticipationStatus;

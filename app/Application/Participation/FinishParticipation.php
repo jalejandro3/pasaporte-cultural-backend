@@ -19,7 +19,7 @@ readonly class FinishParticipation
      * @throws PriorEndDateParticipationException
      * @throws NotFoundParticipationException
      */
-    public function execute(User $assistant, Activity $activity, \DateTimeImmutable $endTime, ?string $verificationCode): Participation
+    public function execute(User $assistant, Activity $activity, \DateTimeImmutable $endTime, string $verificationCode): Participation
     {
         if ($activity->getVerificationCode() !== $verificationCode) {
             throw new ParticipationVerificationCodeMismatchException('Invalid verification code provided.');

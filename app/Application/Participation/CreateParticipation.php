@@ -23,7 +23,7 @@ readonly class CreateParticipation
      * @throws NotFoundActivityException
      * @throws NotFoundUserException
      */
-    public function execute(string $assistantId, string $activityId, \DateTimeImmutable $startTime, ?string $verificationCode): Participation
+    public function execute(string $assistantId, string $activityId, \DateTimeImmutable $startTime, string $verificationCode): Participation
     {
         $activity = $this->activityRepository->findById($activityId);
 

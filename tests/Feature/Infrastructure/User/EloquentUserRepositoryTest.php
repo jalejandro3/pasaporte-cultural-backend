@@ -1,12 +1,10 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Infrastructure\User;
 
 use App\Domain\User\UserRole;
-use App\Infrastructure\User\EloquentUser;
 use App\Infrastructure\User\EloquentUserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Tests\ObjectMother\AssistantMother;
 use Tests\TestCase;
 
