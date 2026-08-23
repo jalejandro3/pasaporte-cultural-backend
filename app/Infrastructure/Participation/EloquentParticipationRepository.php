@@ -28,7 +28,7 @@ class EloquentParticipationRepository implements ParticipationRepository
         );
     }
 
-    public function save(Participation $participation): void
+    public function create(Participation $participation): void
     {
         EloquentParticipation::create([
             'id' => $participation->getId()->value(),
@@ -39,5 +39,16 @@ class EloquentParticipationRepository implements ParticipationRepository
             'start_time' => $participation->getStartTime(),
             'end_time' => $participation->getEndTime(),
         ]);
+    }
+
+    public function update(Participation $participation): void
+    {
+        EloquentParticipation::findOrFail($participation->getId()->value())
+            ->update([
+                'required_hours' => $participation->getRequiredHours()->getTotalHours(),
+                'status' => $participation->status()->value,
+                'start_time' => $participation->getStartTime(),
+                'end_time' => $participation->getEndTime(),
+            ]);
     }
 }

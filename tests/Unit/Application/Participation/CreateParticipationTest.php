@@ -31,7 +31,7 @@ class CreateParticipationTest extends TestCase
         $userRepository->method('findById')->willReturn($assistant);
         $activityRepository->method('findById')->willReturn($activity);
         $participationRepository->method('findByActivityIdAndAssistantId')->willReturn(null);
-        $participationRepository->expects($this->once())->method('save');
+        $participationRepository->expects($this->once())->method('create');
 
         $createParticipation = new CreateParticipation($participationRepository, $activityRepository, $userRepository);
         $participation = $createParticipation->execute($assistant->getId(), $activity->getId(), $startTime, $verificationCode);

@@ -236,8 +236,8 @@ the id-based refactor of the use case, and RFC 9457 error handling.
 - ✅ Port — align `ParticipationRepository`
 - ✅ Migration — `participations` table (UUID primary key + `required_hours`)
 - ✅ Eloquent model
-- ✅ Feature test — `save` against real DB
-- ✅ Adapter `save` + container binding
+- ✅ Feature test — `create` against real DB
+- ✅ Adapter `create` + container binding
 - ✅ Refactor Participation to reference User/Activity by identity — `ParticipationId` + `RequiredHours`; `status()` delegates to `RequiredHours::isSatisfiedBy`
 - ✅ Adapter `findByActivityIdAndAssistantId` — reconstructs from a single row via `fromDatabase`; covered for in-process, completed, not-completed, not-found
 
@@ -275,6 +275,19 @@ the id-based refactor of the use case, and RFC 9457 error handling.
 
 **Next action:** the slice is closed. Candidate next slices: `FinishParticipation` over HTTP (second endpoint, reuses most of this machinery), the pending password ADR, or starting the authentication phase (which retires the `assistant_id`-in-body debt).
 
+### Completed: Fix `FinishParticipation` persistence bug
+
+`FinishParticipation::execute()` reconstructs a persisted `Participation`, mutates it via `finish()`, then persisted it through `ParticipationRepository::save()` — but `save()` was insert-only, so finishing any real participation collided on the primary-key unique constraint and failed against a real database.
+
+- ✅ Split `ParticipationRepository` port into explicit `create()` (insert) and `update()` (mutate an existing row) methods — a CQS split that makes each caller's intent explicit instead of overloading one method with two behaviors
+- ✅ `EloquentParticipationRepository::create()` — renamed from `save()`, insert-only, unchanged behavior
+- ✅ `EloquentParticipationRepository::update()` — `findOrFail()->update([...])`, writes `required_hours`, `status`, `start_time`, `end_time`; throws `ModelNotFoundException` on an absent row
+- ✅ `CreateParticipation` → calls `create()`; `FinishParticipation` → calls `update()`
+- ✅ Feature tests for `update()` (persists mutable fields without duplicating the row; not-found path) and updated unit test mocks for both use cases
+- ✅ Full suite green (61 passed), Larastan level 5 clean, zero remaining `ParticipationRepository::save()` references
+
+**Deferred:** an end-to-end integration test exercising `FinishParticipation::execute()` against a real database — `FinishParticipation` has no HTTP endpoint yet, so today it's only covered transitively (unit test proves the use case calls `update()`; feature test proves `update()` works against a real DB). Add this integration test when `FinishParticipation` gets its HTTP endpoint.
+
 ### Backlog
 
 #### Done
@@ -302,6 +315,7 @@ the id-based refactor of the use case, and RFC 9457 error handling.
 - ✅ HTTP layer for CreateParticipation — route, `CreateParticipationRequest`, `ParticipationController`, `ParticipationResource`, end-to-end happy-path test
 - ✅ RFC 9457 Problem Details error handling — `ProblemDetail`, `ExceptionRenderer` (FQCN map), wired into `withExceptions`, all four error paths covered end-to-end
 - ✅ Organize tests by subdomain (`Unit/Domain`, `Unit/Application`) and by boundary (`Feature/Http`, `Feature/Infrastructure`)
+- ✅ Split `ParticipationRepository::save()` into `create()`/`update()` — fixes `FinishParticipation` failing against a real database (unique-constraint collision on the insert-only `save()`)
 
 #### Adopted conventions
 - **RFC 9457 Problem Details** for all HTTP error responses (`application/problem+json`), with `type`/`title`/`status`/`detail`. New API — adopting the current standard rather than an ad-hoc error format.
@@ -322,6 +336,9 @@ the id-based refactor of the use case, and RFC 9457 error handling.
 - ⬜ Log unmapped exceptions (the ones that fall through the renderer to a 500) so unexpected errors are observable
 - ⬜ Clock abstraction (PSR-20) for `start_time` — currently `new DateTimeImmutable()` directly in the controller, which is non-deterministic in tests; an injectable clock would make it testable
 - ⬜ `save`/creation for Activity — no `ActivityRepository::save` yet (no use case creates activities). Feature tests seed activities via Eloquent directly. Add when the "admin creates activity" use case exists (its own slice).
+
+#### Test coverage debt
+- ⬜ `FinishParticipation::execute()` has no end-to-end integration test against a real database — only transitive coverage today (unit test mocks the port, feature test hits the adapter directly). Add once `FinishParticipation` has an HTTP endpoint.
 
 #### Test maintenance
 - ⬜ The `findByActivityIdAndAssistantId` and HTTP error feature tests share setup (seed activity/assistant, POST, assert body). Extract a helper or data provider if they grow.

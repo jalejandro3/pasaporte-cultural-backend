@@ -5,6 +5,7 @@ namespace Tests\Feature\Infrastructure\Participation;
 use App\Domain\Participation\Participation;
 use App\Domain\Participation\ParticipationStatus;
 use App\Infrastructure\Participation\EloquentParticipationRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\ObjectMother\ActivityMother;
 use Tests\ObjectMother\AssistantMother;
@@ -14,7 +15,7 @@ class EloquentParticipationRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_save_participation()
+    public function test_create_participation()
     {
         $activity = ActivityMother::create(2);
         $assistant = AssistantMother::create();
@@ -22,7 +23,7 @@ class EloquentParticipationRepositoryTest extends TestCase
         $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
         $participationRepository = new EloquentParticipationRepository();
 
-        $participationRepository->save($participation);
+        $participationRepository->create($participation);
 
         $this->assertDatabaseHas('participations', [
             'assistant_id' => $assistant->getId(),
@@ -38,7 +39,7 @@ class EloquentParticipationRepositoryTest extends TestCase
         $startTime = new \DateTimeImmutable();
         $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
         $participationRepository = new EloquentParticipationRepository();
-        $participationRepository->save($participation);
+        $participationRepository->create($participation);
 
         $foundParticipation = $participationRepository->findByActivityIdAndAssistantId($activity->getId(), $assistant->getId());
 
@@ -69,7 +70,7 @@ class EloquentParticipationRepositoryTest extends TestCase
         $participationRepository = new EloquentParticipationRepository();
 
         $participation->finish($endTime);
-        $participationRepository->save($participation);
+        $participationRepository->create($participation);
 
         $foundParticipation = $participationRepository->findByActivityIdAndAssistantId($activity->getId(), $assistant->getId());
         $this->assertEquals($participation->getId()->value(), $foundParticipation->getId()->value());
@@ -89,7 +90,7 @@ class EloquentParticipationRepositoryTest extends TestCase
         $participation->finish($endTime);
         $participationRepository = new EloquentParticipationRepository();
 
-        $participationRepository->save($participation);
+        $participationRepository->create($participation);
 
         $foundParticipation = $participationRepository->findByActivityIdAndAssistantId($activity->getId(), $assistant->getId());
 
@@ -112,7 +113,7 @@ class EloquentParticipationRepositoryTest extends TestCase
         $participation->finish($endTime);
         $participationRepository = new EloquentParticipationRepository();
 
-        $participationRepository->save($participation);
+        $participationRepository->create($participation);
 
         $foundParticipation = $participationRepository->findByActivityIdAndAssistantId($activity->getId(), $assistant->getId());
 
@@ -123,5 +124,44 @@ class EloquentParticipationRepositoryTest extends TestCase
         $this->assertEquals($participation->getActivityId(), $foundParticipation->getActivityId());
         $this->assertEquals($participation->getStartTime()->getTimestamp(), $foundParticipation->getStartTime()->getTimestamp());
         $this->assertEquals($participation->getEndTime()->getTimestamp(), $foundParticipation->getEndTime()->getTimestamp());
+    }
+
+    public function test_update_participation_persists_mutable_fields_without_duplicating_row()
+    {
+        $activity = ActivityMother::create(2);
+        $assistant = AssistantMother::create();
+        $startTime = new \DateTimeImmutable();
+        $endTime = new \DateTimeImmutable('+2 hour');
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
+        $participationRepository = new EloquentParticipationRepository();
+
+        $participationRepository->create($participation);
+
+        $participation->finish($endTime);
+        $participationRepository->update($participation);
+
+        $this->assertDatabaseCount('participations', 1);
+        $this->assertDatabaseHas('participations', [
+            'id' => $participation->getId()->value(),
+            'activity_id' => $activity->getId(),
+            'assistant_id' => $assistant->getId(),
+            'required_hours' => $participation->getRequiredHours()->getTotalHours(),
+            'status' => ParticipationStatus::COMPLETED->value,
+            'start_time' => $startTime->format('Y-m-d H:i:s'),
+            'end_time' => $endTime->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function test_update_on_absent_row_throws_model_not_found_exception()
+    {
+        $activity = ActivityMother::create(2);
+        $assistant = AssistantMother::create();
+        $startTime = new \DateTimeImmutable();
+        $participation = Participation::create($assistant->getId(), $activity->getId(), $activity->getTotalHours(), $startTime);
+        $participationRepository = new EloquentParticipationRepository();
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $participationRepository->update($participation);
     }
 }

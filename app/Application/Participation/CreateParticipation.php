@@ -49,7 +49,7 @@ readonly class CreateParticipation
 
         $newParticipation = Participation::create($assistantId, $activityId, $activity->getTotalHours(), $startTime);
 
-        $this->participationRepository->save($newParticipation);
+        $this->participationRepository->create($newParticipation);
 
         return $newParticipation;
     }

@@ -23,7 +23,7 @@ class FinishParticipationTest extends TestCase
         $participationRepository = $this->createMock(ParticipationRepository::class);
 
         $participationRepository->method('findByActivityIdAndAssistantId')->willReturn($participation);
-        $participationRepository->expects($this->once())->method('save');
+        $participationRepository->expects($this->once())->method('update');
 
         $finishParticipation = new FinishParticipation($participationRepository);
 
@@ -41,7 +41,7 @@ class FinishParticipationTest extends TestCase
         $participationRepository = $this->createMock(ParticipationRepository::class);
 
         $participationRepository->method('findByActivityIdAndAssistantId')->willReturn($participation);
-        $participationRepository->expects($this->once())->method('save');
+        $participationRepository->expects($this->once())->method('update');
 
         $finishParticipation = new FinishParticipation($participationRepository);
 

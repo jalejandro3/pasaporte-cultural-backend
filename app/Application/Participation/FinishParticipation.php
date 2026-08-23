@@ -34,7 +34,7 @@ readonly class FinishParticipation
 
         $currentParticipation->finish($endTime);
 
-        $this->participationRepository->save($currentParticipation);
+        $this->participationRepository->update($currentParticipation);
 
         return $currentParticipation;
     }
